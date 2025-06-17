@@ -33,11 +33,11 @@ impl RichTextPart {
                 out.push_str("</ul>");
             }
             RichTextPart::Config { key, value } => {
-                out.push_str("<p>[");
+                out.push_str("<p class=\"rt-config\">[");
                 html.write_escaped_str(&mut *out, &key).unwrap();
-                out.push(':');
+                out.push_str(": <span class=\"rt-config-value\">");
                 html.write_escaped_str(&mut *out, &value).unwrap();
-                out.push_str("]</p>");
+                out.push_str("]</span></p>");
             }
         }
     }
@@ -75,15 +75,17 @@ impl RichText {
                 }
             }
             if let Some(t) = line.strip_prefix('[') {
-                if let Some((left, right)) = t.split_once(':') {
-                    if let Some(item) = current {
-                        self.parts.push(item);
+                if let Some(t) = t.strip_suffix(']') {
+                    if let Some((left, right)) = t.split_once(':') {
+                        if let Some(item) = current {
+                            self.parts.push(item);
+                        }
+                        current = Some(RichTextPart::Config {
+                            key: left.trim().to_string(),
+                            value: right.trim().to_string()
+                        });
+                        continue 'main;
                     }
-                    current = Some(RichTextPart::Config {
-                        key: left.trim().to_string(),
-                        value: right.trim().to_string()
-                    });
-                    continue 'main;
                 }
             }
             if let Some(RichTextPart::Text(ref mut text)) = current {
@@ -103,9 +105,11 @@ impl RichText {
 
     pub fn to_html(&self) -> String {
         let mut s = String::new();
+        s.push_str("<div class=\"rich-text\">");
         for part in &self.parts {
             part.to_html_into(&mut s);
         }
+        s.push_str("</div>");
         s
     }
 }
