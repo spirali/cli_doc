@@ -24,12 +24,6 @@ struct CommandTemplate<'a> {
     subcommands: Vec<CommandTemplate<'a>>,
 }
 
-#[derive(Template)]
-#[template(path = "richtext.html", escape = "none")]
-struct RichTextTemplate<'a> {
-    text: &'a RichText,
-}
-
 #[derive(Serialize)]
 struct OptionJson<'a> {
     short: Option<&'a str>,
