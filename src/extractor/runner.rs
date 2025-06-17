@@ -85,8 +85,8 @@ pub fn collect_program_info(program: &Path) -> anyhow::Result<ProgramDesc> {
     let mut already_defined = HashSet::new();
     already_defined.insert("-h, --help");
     let command = gather_command_helper(program, &mut args, &mut id_counter)?;
-    Ok(ProgramDesc {
-        command,
-        version: "123".to_string(),
-    })
+    let version = get_program_output(program, &args, "--version")?
+        .trim()
+        .to_string();
+    Ok(ProgramDesc { command, version })
 }

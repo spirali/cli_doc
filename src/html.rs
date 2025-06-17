@@ -10,6 +10,7 @@ use std::fmt::Debug;
 #[template(path = "page.html")]
 struct PageTemplate<'a> {
     project_name: &'a str,
+    version: &'a str,
     command: CommandTemplate<'a>,
     command_json: String,
 }
@@ -52,7 +53,7 @@ struct CategoryJson<'a> {
 
 #[derive(Serialize)]
 struct CommandJson<'a> {
-    name: &'a str,
+    name: String,
     brief: String,
     description: Option<String>,
     usages: Vec<String>,
@@ -63,7 +64,7 @@ struct CommandJson<'a> {
 impl<'a> CommandJson<'a> {
     pub fn new(desc: &'a CommandDesc) -> Self {
         CommandJson {
-            name: &desc.name,
+            name: desc.name.to_string(),
             brief: desc.doc.brief.to_html(),
             description: desc.doc.description.as_ref().map(|t| t.to_html()),
             usages: desc.doc.usage.iter().map(|u| u.to_html()).collect(),
@@ -133,10 +134,12 @@ fn build_command_tree<'a, 'b>(command: &'a CommandDesc, depth: u32) -> CommandTe
 
 pub fn render_html(program: &ProgramDesc) -> anyhow::Result<String> {
     let command_template = build_command_tree(&program.command, 0);
-    let mut command_jsons = Default::default();
+    let mut command_jsons: HashMap<String, CommandJson> = Default::default();
     build_command_json(&program.command, &mut command_jsons);
+
     Ok(PageTemplate {
         project_name: &program.command.name,
+        version: &program.version,
         command: command_template,
         command_json: serde_json::to_string(&command_jsons)?,
     }

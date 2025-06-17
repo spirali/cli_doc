@@ -83,7 +83,6 @@ pub struct CommandDoc {
 
 impl CommandDoc {
     pub fn is_args_effectively_empty(&self) -> bool {
-        dbg!(&self.arguments);
         self.arguments.iter().all(|arg| arg.brief.is_empty())
     }
 }

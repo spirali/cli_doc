@@ -1052,5 +1052,4 @@ Usage: cargo add [OPTIONS] <DEP>[@<VERSION>] ...
         "#);
         assert!(commands.is_empty());
     }
-
 }

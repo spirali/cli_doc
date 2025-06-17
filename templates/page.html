@@ -31,7 +31,7 @@
             border: 1px solid #e1e1e1;
             border-radius: 6px;
             padding: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .search-container {
@@ -353,6 +353,12 @@
             font-style: italic;
         }
 
+        .version {
+            color: #999;
+            text-align: right;
+            font-size: 16px;
+        }
+
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -379,6 +385,10 @@
             <button class="btn btn-primary" onclick="performSearch()">Search</button>
             <button class="btn" onclick="explainCommand()">Explain</button>
         </div>
+    </div>
+
+    <div class="version">
+    {{ version }}
     </div>
 
     <div class="main-content">
