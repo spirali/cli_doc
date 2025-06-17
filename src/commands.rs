@@ -1,5 +1,5 @@
-use askama::filters::{Escaper, Html};
 use crate::text::RichText;
+use askama::filters::{Escaper, Html};
 
 pub type CommandId = u32;
 
@@ -8,6 +8,14 @@ pub type CommandId = u32;
 pub struct OptionDesc {
     pub short: Option<String>,
     pub long: String,
+    pub brief: RichText,
+    pub description: Option<RichText>,
+}
+
+#[derive(Debug)]
+#[cfg_attr(test, derive(PartialEq, Eq))]
+pub struct ArgumentDesc {
+    pub name: String,
     pub brief: RichText,
     pub description: Option<RichText>,
 }
@@ -45,14 +53,14 @@ impl Usage {
                     out.push_str("</span> ");
                 }
                 UsagePart::Argument(argument) => {
-                    out.push_str("<span class=\"usage-argument\">&lt;");
+                    out.push_str("<span class=\"usage-argument\">");
                     html.write_escaped_str(&mut out, &argument).unwrap();
-                    out.push_str("&gt;</span> ");
+                    out.push_str("</span> ");
                 }
                 UsagePart::Option(option) => {
-                    out.push_str("<span class=\"usage-options\">[");
+                    out.push_str("<span class=\"usage-option\">");
                     html.write_escaped_str(&mut out, &option).unwrap();
-                    out.push_str("]</span> ");
+                    out.push_str("</span> ");
                 }
             }
         }
@@ -69,8 +77,15 @@ pub struct CommandDoc {
     pub brief: RichText,
     pub description: Option<RichText>,
     pub usage: Vec<Usage>,
-    pub arguments: Vec<String>,
+    pub arguments: Vec<ArgumentDesc>,
     pub option_categories: Vec<CategoryDesc>,
+}
+
+impl CommandDoc {
+    pub fn is_args_effectively_empty(&self) -> bool {
+        dbg!(&self.arguments);
+        self.arguments.iter().all(|arg| arg.brief.is_empty())
+    }
 }
 
 #[derive(Debug)]

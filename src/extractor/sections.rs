@@ -56,21 +56,21 @@ impl<'a> Section<'a> {
         indent: usize,
         mut out: &'c mut Vec<Section<'a>>,
     ) {
-        self.subsections.extract_if(.., |s| s.indent < indent).for_each(|mut s| {
-            let i = s.indent;
-            let idx = out.len();
-            s.extract_sections_upto_ident(indent - i, out);
-            out.insert(idx, s);
-        });
+        self.subsections
+            .extract_if(.., |s| s.indent < indent)
+            .for_each(|mut s| {
+                let i = s.indent;
+                let idx = out.len();
+                s.extract_sections_upto_ident(indent - i, out);
+                out.insert(idx, s);
+            });
     }
 
     pub fn common_subsection_indent(&self) -> usize {
         self.subsections.iter().map(|s| s.indent).min().unwrap_or(0)
     }
 
-
-    pub fn as_rich_text_into(&self, out: &mut RichText)
-    {
+    pub fn as_rich_text_into(&self, out: &mut RichText) {
         out.add_lines(&self.paragraph);
         self.subsections_as_rich_text_into(out);
     }
@@ -86,7 +86,14 @@ impl<'a> Section<'a> {
             description.add_lines(&section.paragraph);
             section.subsections_as_rich_text_into(&mut description);
         }
-        (brief, if description.is_empty() { None } else { Some(description)})
+        (
+            brief,
+            if description.is_empty() {
+                None
+            } else {
+                Some(description)
+            },
+        )
     }
 
     pub fn subsections_as_rich_text(&self) -> RichText {
@@ -167,7 +174,7 @@ fn read_sections<'a, 'b>(
         if indent <= base_indent && level > 0 {
             break;
         }
-        let paragraph = reader.read_paragraph(indent);;
+        let paragraph = reader.read_paragraph(indent);
         let subsections = if reader
             .current()
             .map(|line| compute_indentation(line) > indent)
@@ -203,8 +210,8 @@ fn compute_indentation(text: &str) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use insta::assert_debug_snapshot;
     use super::*;
+    use insta::assert_debug_snapshot;
 
     #[test]
     pub fn test_parse_big() {
@@ -1014,7 +1021,6 @@ Run `cargo help add` for more detailed information.
             },
         ]
         "#);
-
     }
 
     #[test]

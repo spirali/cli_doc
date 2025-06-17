@@ -332,8 +332,12 @@
             margin-top: 40px;
         }
 
-        .usage-options {
+        .usage-option {
             color: #ac7acc;
+        }
+
+        .usage-argument {
+            color: #d73a49;;
         }
 
         .rich-text ul {
@@ -434,21 +438,7 @@
                 </div>
 
                 <!-- Arguments Section -->
-                <div class="info-section">
-                    <div class="info-header">
-                        Arguments
-                    </div>
-                    <div class="info-content" id="argumentsInfo">
-                        <div class="argument-item" onclick="expandArgument(this)">
-                            <div class="argument-name">[command]</div>
-                            <div class="argument-description">The Git command to execute</div>
-                            <div class="option-full-doc">
-                                Optional command to execute. Common commands include add, commit, push, pull, clone, etc.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                <div id="argumentsInfo"></div>
                 <!-- Options Section -->
                 <div id="categoryList"></div>
             </div>
@@ -523,172 +513,181 @@
                 ${usages} ${desc}
             `;
 
-        /*
-        // Update arguments
-        if (data.arguments.length === 0) {
-            document.getElementById('argumentsInfo').innerHTML = '<div class="no-selection">No arguments</div>';
-        } else {
-            document.getElementById('argumentsInfo').innerHTML = data.arguments.map(arg => `
-                    <div class="argument-item" onclick="expandArgument(this)">
-                        <div class="argument-name">${arg.name}</div>
-                        <div class="argument-description">${arg.desc}</div>
-                        <div class="option-full-doc">
-                            ${arg.fullDoc}
-                        </div>
-                    </div>
-                `).join('');
-        }*/
-
         // <div className="info-section">
         //     <div className="info-header">
-        //         Options
+        //         Arguments
         //     </div>
-        //     <div className="info-content" id="optionsList">
-        //         <div className="option-item" onClick="toggleFullDoc(this)">
-        //             <div className="option-name">--version</div>
-        //             <div className="option-description">Show version information</div>
+        //     <div className="info-content" id="argumentsInfo">
+        //         <div className="argument-item" onClick="expandArgument(this)">
+        //             <div className="argument-name">[command]</div>
+        //             <div className="argument-description">The Git command to execute</div>
         //             <div className="option-full-doc">
-        //                 Displays the Git version number and build information.
-        //             </div>
-        //         </div>
-        //         <div className="option-item" onClick="toggleFullDoc(this)">
-        //             <div className="option-name">--help</div>
-        //             <div className="option-description">Show help message</div>
-        //             <div className="option-full-doc">
-        //                 Shows the help message with available commands and common options.
+        //                 Optional command to execute. Common commands include add, commit, push, pull, clone, etc.
         //             </div>
         //         </div>
         //     </div>
         // </div>
 
-        if (data.categories.length === 0) {
-            document.getElementById('categoryList').innerHTML = '';
+        if (data.arguments.length === 0) {
+            document.getElementById('argumentsInfo').innerHTML = '';
         } else {
-            document.getElementById('categoryList').innerHTML = data.categories.map(category => {
-                const items = category.options.map(option => {
-                     let desc = "";
-                     let className = "";
-                     let showMore = "";
-                     if (option.description) {
-                         desc = `<div class="option-full-doc">${option.description}</div>`;
-                         className = "option-item-expandable";
-                         showMore = `
-                             <div class="show-more-indicator">
-                                 Show more
-                             </div>`;
-                     }
-                    let short = "";
-                     if (option.short) {
-                         short = `<span class="option-short">${option.short},</span> `
-                     };
-                    return `<div class="option-item ${className}" onClick="toggleFullDoc(this)">
+            let items = data.arguments.map(argument => {
+                let desc = "";
+                let className = "";
+                let showMore = "";
+                let onClick = "";
+                if (argument.description) {
+                    desc = `<div class="option-full-doc">${argument.description}</div>`;
+                    className = "option-item-expandable";
+                    showMore = '<div class="show-more-indicator">Show more</div>';
+                    onClick='onClick="toggleFullDoc(this)"';
+                }
+                return `<div class="option-item ${className}" ${onClick}">
                     <div class="option-header">
                         <div class="option-main">
-                          <div class="option-name">${short}${option.long}</div>
-                          <div class="option-description">${option.brief}</div>
+                          <div class="argument-name">${argument.name}</div>
+                          <div class="option-description">${argument.brief}</div>
                         </div>
                         ${showMore}
                     </div>
                     ${desc}
-                </div>
-                `
+                </div>`});
+                document.getElementById('argumentsInfo').innerHTML = `<div class="info-section">
+                    <div class="info-header">
+                        Arguments
+                    </div>
+                    <div class="info-content" id="optionsList">
+                        ${items.join("")}
+                    </div>
+                </div>`;
+            }
+
+                if (data.categories.length === 0) {
+                document.getElementById('categoryList').innerHTML = '';
+            } else {
+
+                document.getElementById('categoryList').innerHTML = data.categories.map(category => {
+                        const items = category.options.map(option => {
+                                let desc = "";
+                                let className = "";
+                                let showMore = "";
+                                let onClick = "";
+                                if (option.description) {
+                                    desc = `<div class="option-full-doc">${option.description}</div>`;
+                                    className = "option-item-expandable";
+                                    showMore = '<div class="show-more-indicator">Show more</div>';
+                                    onClick='onClick="toggleFullDoc(this)"';
+                                }
+                                let short = "";
+                                if (option.short) {
+                                    short = `<span class="option-short">${option.short},</span> `
+                                }
+                                return `<div class="option-item ${className}" ${onClick}">
+                                    <div class="option-header">
+                                        <div class="option-main">
+                                          <div class="option-name">${short}${option.long}</div>
+                                          <div class="option-description">${option.brief}</div>
+                                        </div>
+                                        ${showMore}
+                                    </div>
+                                    ${desc}
+                                </div>`
+                            });
+                        return `<div class="info-section">
+                            <div class="info-header">
+                                ${category.title}
+                            </div>
+                            <div class="info-content" id="optionsList">
+                                ${items.join("")}
+                            </div>
+                        </div>`
                     }
-                );
-                return `<div class="info-section">
-                        <div class="info-header">
-                            ${category.title}
-                        </div>
-                        <div class="info-content" id="optionsList">
-                            ${items.join("")}
-                        </div>
-                    </div>`
+                ).join("");
+                // document.getElementById('optionsList').innerHTML = data.options.map(option => `
+                //         <div class="option-item" onclick="toggleFullDoc(this)">
+                //             <div class="option-name">${option.name}</div>
+                //             <div class="option-description">${option.desc}</div>
+                //             <div class="option-full-doc">
+                //                 ${option.fullDoc}
+                //             </div>
+                //         </div>
+                //     `).join('');
+            }
                 }
-            ).join("");
-            // document.getElementById('optionsList').innerHTML = data.options.map(option => `
-            //         <div class="option-item" onclick="toggleFullDoc(this)">
-            //             <div class="option-name">${option.name}</div>
-            //             <div class="option-description">${option.desc}</div>
-            //             <div class="option-full-doc">
-            //                 ${option.fullDoc}
-            //             </div>
-            //         </div>
-            //     `).join('');
-        }
-    }
 
-    function expandArgument(element) {
-        const fullDoc = element.querySelector('.option-full-doc');
-        const isExpanded = fullDoc.classList.contains('expanded');
+                function expandArgument(element) {
+                const fullDoc = element.querySelector('.option-full-doc');
+                const isExpanded = fullDoc.classList.contains('expanded');
 
-        // Close all other expanded docs
-        document.querySelectorAll('.option-full-doc.expanded').forEach(doc => {
-            doc.classList.remove('expanded');
-        });
+                // Close all other expanded docs
+                document.querySelectorAll('.option-full-doc.expanded').forEach(doc => {
+                doc.classList.remove('expanded');
+            });
 
-        // Toggle current doc
-        if (!isExpanded) {
-            fullDoc.classList.add('expanded');
-        }
-    }
+                // Toggle current doc
+                if (!isExpanded) {
+                fullDoc.classList.add('expanded');
+            }
+            }
 
-    function toggleFullDoc(element) {
-        const fullDoc = element.querySelector('.option-full-doc');
-        const isExpanded = fullDoc.classList.contains('expanded');
+                function toggleFullDoc(element) {
+                const fullDoc = element.querySelector('.option-full-doc');
+                const isExpanded = fullDoc.classList.contains('expanded');
 
-        // Close all other expanded docs
-        document.querySelectorAll('.option-full-doc.expanded').forEach(doc => {
-            doc.classList.remove('expanded');
-        });
+                // Close all other expanded docs
+                document.querySelectorAll('.option-full-doc.expanded').forEach(doc => {
+                doc.classList.remove('expanded');
+            });
 
-        // Toggle current doc
-        if (!isExpanded) {
-            fullDoc.classList.add('expanded');
-        }
-    }
+                // Toggle current doc
+                if (!isExpanded) {
+                fullDoc.classList.add('expanded');
+            }
+            }
 
-    function performSearch() {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                function performSearch() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
-        if (!searchTerm) {
-            alert('Please enter a search term');
-            return;
-        }
+                if (!searchTerm) {
+                alert('Please enter a search term');
+                return;
+            }
 
-        let results = [];
+                let results = [];
 
-        Object.keys(commandData).forEach(command => {
-            const data = commandData[command];
-            if (command.toLowerCase().includes(searchTerm) ||
+                Object.keys(commandData).forEach(command => {
+                const data = commandData[command];
+                if (command.toLowerCase().includes(searchTerm) ||
                 data.info.toLowerCase().includes(searchTerm)) {
                 results.push(`Command: ${command}`);
             }
 
-            data.options.forEach(option => {
+                data.options.forEach(option => {
                 if (option.name.toLowerCase().includes(searchTerm) ||
-                    option.desc.toLowerCase().includes(searchTerm)) {
-                    results.push(`${command} ${option.name}`);
-                }
+                option.desc.toLowerCase().includes(searchTerm)) {
+                results.push(`${command} ${option.name}`);
+            }
             });
-        });
+            });
 
-        if (results.length > 0) {
-            alert('Found:\n' + results.slice(0, 8).join('\n'));
-        } else {
-            alert('No results found');
-        }
-    }
+                if (results.length > 0) {
+                alert('Found:\n' + results.slice(0, 8).join('\n'));
+            } else {
+                alert('No results found');
+            }
+            }
 
-    function explainCommand() {
-        const data = commandData[currentCommand];
-        if (data) {
-            alert(`${currentCommand}\n\n${data.info}`);
-        } else {
-            alert('No explanation available.');
-        }
-    }
+                function explainCommand() {
+                const data = commandData[currentCommand];
+                if (data) {
+                alert(`${currentCommand}\n\n${data.info}`);
+            } else {
+                alert('No explanation available.');
+            }
+            }
 
-    // Initialize
-    showCommandDetails('git');
+                // Initialize
+                showCommandDetails('git');
 </script>
 </body>
 </html>

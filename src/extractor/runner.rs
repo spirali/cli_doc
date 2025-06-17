@@ -1,11 +1,11 @@
 use crate::commands::{CommandDesc, CommandId, ProgramDesc};
-use crate::extractor::sections::{parse_sections};
+use crate::extractor::clap_parser::ClapParser;
+use crate::extractor::sections::parse_sections;
 use anyhow::{anyhow, bail};
 use colored::Colorize;
 use std::collections::HashSet;
 use std::path::Path;
 use std::process::Command;
-use crate::extractor::clap_parser::ClapParser;
 
 fn get_program_output(program: &Path, args: &[String], flag: &str) -> anyhow::Result<String> {
     print!("Running {}", program.display().to_string().cyan());
@@ -56,16 +56,15 @@ fn gather_command_helper(
     let mut sections = parse_sections(&output);
     let (command_doc, subcommands) = ClapParser::new().parse(&mut sections)?;
 
-    let commands: Vec<_> = subcommands.into_iter().map(|s| {
-        args.push(s.name.to_string());
-        let r = gather_command_helper(
-            program,
-            args,
-            id_counter,
-        );
-        args.pop();
-        r
-    }).collect::<anyhow::Result<Vec<_>>>()?;
+    let commands: Vec<_> = subcommands
+        .into_iter()
+        .map(|s| {
+            args.push(s.name.to_string());
+            let r = gather_command_helper(program, args, id_counter);
+            args.pop();
+            r
+        })
+        .collect::<anyhow::Result<Vec<_>>>()?;
 
     let name = args
         .last()

@@ -11,7 +11,7 @@ pub struct RichText {
 pub enum RichTextPart {
     Text(String),
     Ul(Vec<String>),
-    Config { key: String, value: String }
+    Config { key: String, value: String },
 }
 
 impl RichTextPart {
@@ -37,7 +37,7 @@ impl RichTextPart {
                 html.write_escaped_str(&mut *out, &key).unwrap();
                 out.push_str(": <span class=\"rt-config-value\">");
                 html.write_escaped_str(&mut *out, &value).unwrap();
-                out.push_str("]</span></p>");
+                out.push_str("</span>]</p>");
             }
         }
     }
@@ -48,14 +48,25 @@ impl RichText {
         RichText { parts: Vec::new() }
     }
 
-    pub fn from_simple_line(line: String) -> RichText {
+    pub fn from_single_line(line: &str) -> RichText {
         let mut text = RichText::new();
-        text.parts.push(RichTextPart::Text(line));
+        text.add_lines(&[&line]);
         text
     }
 
     pub fn is_empty(&self) -> bool {
         self.parts.is_empty()
+    }
+
+    fn push_part(&mut self, item: Option<RichTextPart>) {
+        if let Some(item) = item {
+            if let RichTextPart::Text(text) = &item {
+                if text.is_empty() {
+                    return;
+                }
+            }
+            self.parts.push(item);
+        }
     }
 
     pub fn add_lines(&mut self, lines: &[&str]) {
@@ -66,9 +77,7 @@ impl RichText {
                     if let Some(RichTextPart::Ul(ref mut items)) = current {
                         items.push(t.to_string())
                     } else {
-                        if let Some(item) = current {
-                            self.parts.push(item);
-                        }
+                        self.push_part(current);
                         current = Some(RichTextPart::Ul(vec![t.to_string()]));
                     }
                     continue 'main;
@@ -77,12 +86,10 @@ impl RichText {
             if let Some(t) = line.strip_prefix('[') {
                 if let Some(t) = t.strip_suffix(']') {
                     if let Some((left, right)) = t.split_once(':') {
-                        if let Some(item) = current {
-                            self.parts.push(item);
-                        }
+                        self.push_part(current);
                         current = Some(RichTextPart::Config {
                             key: left.trim().to_string(),
-                            value: right.trim().to_string()
+                            value: right.trim().to_string(),
                         });
                         continue 'main;
                     }
@@ -92,15 +99,11 @@ impl RichText {
                 text.push(' ');
                 text.push_str(line);
             } else {
-                if let Some(item) = current {
-                    self.parts.push(item);
-                }
+                self.push_part(current);
                 current = Some(RichTextPart::Text(line.to_string()));
             }
         }
-        if let Some(item) = current {
-            self.parts.push(item);
-        }
+        self.push_part(current);
     }
 
     pub fn to_html(&self) -> String {

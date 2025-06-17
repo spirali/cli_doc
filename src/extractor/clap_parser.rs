@@ -1,8 +1,11 @@
-use crate::commands::{CategoryDesc, CommandDesc, CommandDoc, CommandId, CommandOuterDoc, OptionDesc, Usage, UsagePart};
+use crate::commands::{
+    ArgumentDesc, CategoryDesc, CommandDesc, CommandDoc, CommandId, CommandOuterDoc, OptionDesc,
+    Usage, UsagePart,
+};
 use crate::extractor::sections::Section;
+use crate::text::RichText;
 use anyhow::bail;
 use itertools::Either;
-use crate::text::RichText;
 
 pub(crate) struct ClapParser {}
 
@@ -26,14 +29,12 @@ impl ClapParser {
         let usage = loop {
             if let Some(s) = sections.get(intro_section) {
                 if s.first_line().starts_with("Usage: ") {
-                    let usage_content = s
-                        .first_line()
-                        .strip_prefix("Usage: ").unwrap();
+                    let usage_content = s.first_line().strip_prefix("Usage: ").unwrap();
                     let mut usage = vec![usage_content.to_string()];
                     for s in s.subsections() {
                         usage.push(s.paragraph());
                     }
-                    break usage
+                    break usage;
                 }
                 s.as_rich_text_into(&mut desc);
                 intro_section += 1;
@@ -43,6 +44,7 @@ impl ClapParser {
         };
         let sections = &mut sections[intro_section..];
         let commands = self.extract_commands(sections);
+        let arguments = self.extract_arguments(sections);
         let option_categories = self.extract_options(sections);
 
         Ok((
@@ -50,7 +52,7 @@ impl ClapParser {
                 brief,
                 description: if desc.is_empty() { None } else { Some(desc) },
                 usage: usage.iter().map(|s| parse_usage(s.as_str())).collect(),
-                arguments: vec![],
+                arguments,
                 option_categories,
             },
             commands,
@@ -72,8 +74,7 @@ impl ClapParser {
                 continue;
             };
             section.extract_sections_upto_ident(8, &mut option_sections);
-            let options: Vec<_> =
-                option_sections
+            let options: Vec<_> = option_sections
                 .iter()
                 .flat_map(|s| {
                     if s.lines().len() == 1 {
@@ -82,19 +83,22 @@ impl ClapParser {
                         let (brief, description) = if right.is_empty() {
                             s.subsections_as_brief_and_full_description()
                         } else {
-                            (RichText::from_simple_line(right.trim().to_string()), None)
+                            (RichText::from_single_line(right.trim()), None)
                         };
-                        Either::Left(Some(OptionDesc {
-                            short,
-                            long,
-                            brief,
-                            description,
-                        }).into_iter())
+                        Either::Left(
+                            Some(OptionDesc {
+                                short,
+                                long,
+                                brief,
+                                description,
+                            })
+                            .into_iter(),
+                        )
                     } else {
                         Either::Right(s.lines().iter().map(|s| {
                             let (left, right) = split_once2(s, "  ");
                             let (short, long) = split_short_long(left);
-                            let brief = RichText::from_simple_line(right.trim().to_string());
+                            let brief = RichText::from_single_line(right.trim());
                             OptionDesc {
                                 short,
                                 long,
@@ -112,6 +116,36 @@ impl ClapParser {
             });
         }
         categories
+    }
+
+    fn extract_arguments(&self, sections: &[Section]) -> Vec<ArgumentDesc> {
+        if let Some(section) = sections
+            .iter()
+            .find(|s| s.first_line().starts_with("Arguments:"))
+        {
+            section
+                .subsections()
+                .iter()
+                .map(|s| {
+                    if let Some((left, right)) = s.first_line().split_once("  ") {
+                        ArgumentDesc {
+                            name: left.trim().to_string(),
+                            brief: RichText::from_single_line(right.trim()),
+                            description: None,
+                        }
+                    } else {
+                        let (brief, description) = s.subsections_as_brief_and_full_description();
+                        ArgumentDesc {
+                            name: s.paragraph(),
+                            brief,
+                            description,
+                        }
+                    }
+                })
+                .collect()
+        } else {
+            Vec::new()
+        }
     }
 
     fn extract_commands(&self, sections: &[Section]) -> Vec<CommandOuterDoc> {
@@ -157,16 +191,18 @@ impl ClapParser {
 
 fn parse_usage(input: &str) -> Usage {
     Usage {
-        parts:
-        input.split_whitespace().map(|s| {
-            if s.starts_with('<') && s.ends_with('>') {
-                UsagePart::Argument(s[1..s.len() - 1].to_string())
-            } else if s.starts_with('[') && s.ends_with(']') {
-                UsagePart::Option(s[1..s.len() - 1].to_string())
-            } else {
-                UsagePart::Command(s.to_string())
-            }
-        }).collect()
+        parts: input
+            .split_whitespace()
+            .map(|s| {
+                if s.starts_with('<') {
+                    UsagePart::Argument(s.to_string())
+                } else if s.starts_with('[') {
+                    UsagePart::Option(s.to_string())
+                } else {
+                    UsagePart::Command(s.to_string())
+                }
+            })
+            .collect(),
     }
 }
 
@@ -190,10 +226,10 @@ fn split_short_long(s: &str) -> (Option<String>, String) {
 
 #[cfg(test)]
 mod tests {
-    use insta::{assert_debug_snapshot, assert_snapshot};
     use super::*;
     use crate::extractor::sections::parse_sections;
     use crate::text::RichText;
+    use insta::{assert_debug_snapshot, assert_snapshot};
 
     fn parse_clap(text: &str) -> (CommandDoc, Vec<CommandOuterDoc>) {
         let mut sections = parse_sections(text);
@@ -870,5 +906,58 @@ GLOBAL OPTIONS:
         }
         "#);
         assert_debug_snapshot!(commands, @r#""#);
+    }
+
+    #[test]
+    fn test_parse_clap_cargo_plain_args() {
+        let text = "Create a new cargo package at <path>
+
+Usage: cargo new [OPTIONS] <PATH>
+
+Arguments:
+  <PATH>
+";
+        let (doc, commands) = parse_clap(text);
+        assert_debug_snapshot!(doc, @r#"
+        CommandDoc {
+            brief: RichText {
+                parts: [
+                    Text(
+                        "Create a new cargo package at <path>",
+                    ),
+                ],
+            },
+            description: None,
+            usage: [
+                Usage {
+                    parts: [
+                        Command(
+                            "cargo",
+                        ),
+                        Command(
+                            "new",
+                        ),
+                        Option(
+                            "OPTIONS",
+                        ),
+                        Argument(
+                            "PATH",
+                        ),
+                    ],
+                },
+            ],
+            arguments: [
+                ArgumentDesc {
+                    name: "<PATH>",
+                    brief: RichText {
+                        parts: [],
+                    },
+                    description: None,
+                },
+            ],
+            option_categories: [],
+        }
+        "#);
+        assert!(commands.is_empty());
     }
 }

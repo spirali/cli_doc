@@ -1,11 +1,10 @@
+use crate::commands::{CommandDesc, CommandId, ProgramDesc};
+use crate::text::RichText;
+use askama::filters::{Escaper, Html};
+use askama::{Template, filters};
+use serde::Serialize;
 use std::collections::HashMap;
 use std::fmt::Debug;
-use crate::commands::{CommandDesc, CommandId, ProgramDesc};
-use askama::{filters, Template};
-use askama::filters::{Escaper, Html};
-use serde::Serialize;
-use crate::text::RichText;
-
 
 #[derive(Template)]
 #[template(path = "page.html")]
@@ -27,7 +26,7 @@ struct CommandTemplate<'a> {
 #[derive(Template)]
 #[template(path = "richtext.html", escape = "none")]
 struct RichTextTemplate<'a> {
-    text: &'a RichText
+    text: &'a RichText,
 }
 
 #[derive(Serialize)]
@@ -39,9 +38,16 @@ struct OptionJson<'a> {
 }
 
 #[derive(Serialize)]
+struct ArgumentJson {
+    name: String,
+    brief: String,
+    description: Option<String>,
+}
+
+#[derive(Serialize)]
 struct CategoryJson<'a> {
     title: &'a str,
-    options: Vec<OptionJson<'a>>
+    options: Vec<OptionJson<'a>>,
 }
 
 #[derive(Serialize)]
@@ -50,26 +56,48 @@ struct CommandJson<'a> {
     brief: String,
     description: Option<String>,
     usages: Vec<String>,
+    arguments: Vec<ArgumentJson>,
     categories: Vec<CategoryJson<'a>>,
 }
 
 impl<'a> CommandJson<'a> {
     pub fn new(desc: &'a CommandDesc) -> Self {
-        let html = Html::default();
         CommandJson {
             name: &desc.name,
             brief: desc.doc.brief.to_html(),
             description: desc.doc.description.as_ref().map(|t| t.to_html()),
             usages: desc.doc.usage.iter().map(|u| u.to_html()).collect(),
-            categories: desc.doc.option_categories.iter().map(|c| CategoryJson {
-                title: &c.title,
-                options: c.options.iter().map(|o| OptionJson {
-                    short: o.short.as_deref(),
-                    long: { let mut s = String::new(); html.write_escaped_str(&mut s, &o.long).unwrap(); s },
-                    brief: o.brief.to_html(),
-                    description: o.description.as_ref().map(|t| t.to_html()),
-                }).collect(),
-            }).collect(),
+            arguments: if desc.doc.is_args_effectively_empty() {
+                Vec::new()
+            } else {
+                desc.doc
+                    .arguments
+                    .iter()
+                    .map(|a| ArgumentJson {
+                        name: escape_html(&a.name),
+                        brief: a.brief.to_html(),
+                        description: a.description.as_ref().map(|t| t.to_html()),
+                    })
+                    .collect()
+            },
+            categories: desc
+                .doc
+                .option_categories
+                .iter()
+                .map(|c| CategoryJson {
+                    title: &c.title,
+                    options: c
+                        .options
+                        .iter()
+                        .map(|o| OptionJson {
+                            short: o.short.as_deref(),
+                            long: escape_html(&o.long),
+                            brief: o.brief.to_html(),
+                            description: o.description.as_ref().map(|t| t.to_html()),
+                        })
+                        .collect(),
+                })
+                .collect(),
         }
     }
 }
@@ -82,10 +110,14 @@ fn build_command_json<'a>(command: &'a CommandDesc, out: &mut HashMap<String, Co
     }
 }
 
-fn build_command_tree<'a, 'b>(
-    command: &'a CommandDesc,
-    depth: u32,
-) -> CommandTemplate<'a> {
+fn escape_html(s: &str) -> String {
+    let html = Html::default();
+    let mut out = String::new();
+    html.write_escaped_str(&mut out, s).unwrap();
+    out
+}
+
+fn build_command_tree<'a, 'b>(command: &'a CommandDesc, depth: u32) -> CommandTemplate<'a> {
     let subcommands = command
         .commands
         .iter()
