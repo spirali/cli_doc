@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFYAAABeCAYAAAC5BeOaAAAACXBIWXMAAA3nAAAN5wGZFKomAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAABN9JREFUeNrtnG9oVXUYxz/PvHObZrWWGsuwWkWT2uhVf/bCQlKMsj9vo39kFjoKIhAMkuiNBb7JysV60SRchCj4ohiVmo0MKVqQXg2WM2VabMNkc5tz9+nF+cVy7Xbv7j33/LvPF35wOefcc3773N/v+3ue55wzUVVM/qvCEBhYA2sysAbWwJoMrIGNoVKlvoCI3AvMB0ZU9VC5gJVSZ14ikgZuB46paqNZgSmaViAiVwK3OBsAWCAijwGDwElV/d2sIH+YC4F1wOPAXTlmxDngMPAlsFtVf0sUWVUtujmArwIjgBbQMsBOP/oSlZbyYZRWAB8DTxVzGuCEWcHlYFuBbUX2IwM0qGqfRQVTo3Vjlt0TwBfOSwEGgDZgP/DHtGO7kgS1aI918elMnjkELHPHpN229LTvNgDrge+AR5Pkr3547KIs2w+o6tEcP2gv8IFrliBM01CW7c0iUmNFmMLVB4zNsP1mYJ+I3GlgC/PnYWBPlt33AD3OSw1sAdrk0tRs5690n28QkY0iUmfVrfzDrvuA3cDiPA4fBTqBbarak1iyfoUXQD2wd5ap7C5gadJCLVX1vx7rRu9m4EGXqubSsItj95kV5Ae4EdgArAWqchw+BqxU1W8NbP6A/7mDkMmxWB4F7tCEPEwW5B2EX4HlwJEs+5cBTRZuFbZQHnTxbTrLIY0G1pvmtSJSW0BS0ZVld8rATk3f0yLykYisEJE5efwYVcCKLLtPJQWsHyNkHvC8awMi0o1XCjwCnPzXNWpEZB3QCsxUQzgPfG9RgTf6WoBun/ryhqq+ZVbgr74B3klSglCsFYznEZ/mUgfQqqrjs5gpS/KsSxSii8BxVb0Yaq0AWAq87ixhIs8awRCwE7h7lte6Hviawm6xz6YNAs9Eplbg7hrcileDXQTUAq8BdcBZ4GWXKPyiqpOzPHcK+AFoDirsBh5W1c9DrW79zyib8WZiAedZGcBInd66Cu1vnB6KuzGEa94U96ggHx2L0zWDSCG3Oo8dLPI83S4sWx4Q1AlgS2hRQZANuBrYgVe/LaW3poFVkbqDEEi66NUbFpdoxp1T1aFQU1pTMhYvA2sysAbWwJoMrIE1sCbfawXyItcitKDMDf2vUkap5qC+y/nQskNfHuN8iUdQOpl6vTMKGkBYo20ciiVYeZr51HAar0ASNfVSz226mUz8PLaa5ohCBWignyXxXLzm0I9Xaouixhgtug4cDljdTh9ejTSK2qo7GInv4vUmKfpZj7IKiUBUABdQ9tBOh2o4s8nqsZYgGFiTgTWwBtbkyZcijGzgOi7xPrAaiMLr9MMIu5jLK2EVYooesSIIl9gLPBERqABXoDzLOB1hdaD4IswLNFHBzxGdkUolC/W94NNaPzy2MsJWJ4yH84pT8WD/ogc4HlGw+7X9P/8xKR5g9TMmUdagHI6UBcBXwJOx9djLTtZKHRmuChXpBMo4f4ZV1SoJWJMlCAbWwJoMbGxqBQCylmtI0YJSXYLgKYPQox/SGxewfj2w8RDKp8CCEvY1g/C2trGpLMC6BzZO4b3eGYR5PaDbOZB8j51HU2BQvXF7f3ksXpOcDbjPZ8oCrLZzAvgkoP72UkVn+UQF9TzHGX5CWY2UxBYuoPxIhi1hPppptQJLEAysycAaWANrMrAGNun6G7tgGklbFFTHAAAAAElFTkSuQmCC">
+    <title>{{ project_name }}: CLI doc</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fafafa;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            border: 1px solid #e1e1e1;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #d1d1d1;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #007acc;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: 1px solid #d1d1d1;
+            border-radius: 4px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #f5f5f5;
+        }
+
+        .btn-primary {
+            background: #007acc;
+            color: white;
+            border-color: #007acc;
+        }
+
+        .btn-primary:hover {
+            background: #005a9e;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: calc(100vh - 140px);
+        }
+
+        .column {
+            background: white;
+            border: 1px solid #e1e1e1;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .column-header {
+            padding: 12px 16px;
+            background: #f8f8f8;
+            border-bottom: 1px solid #e1e1e1;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+        }
+
+        .column-content {
+            padding: 16px;
+            height: calc(100% - 65px);
+            overflow-y: auto;
+        }
+
+        .info-section {
+            margin-bottom: 16px;
+            padding: 12px;
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+            background: #fafafa;
+        }
+
+        .info-header {
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+            margin-bottom: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .info-content {
+            font-size: 13px;
+            line-height: 1.4;
+            color: #555;
+        }
+
+        /*.info-content.collapsed {*/
+        /*    display: none;*/
+        /*}*/
+
+        .info-brief {
+            font-style: italic;
+            color: #777;
+        }
+
+        .command-text {
+            flex: 1;
+        }
+
+        .command-signature {
+            font-family: 'Monaco', 'Courier New', monospace;
+            background: white;
+            padding: 8px;
+            border-radius: 3px;
+            border: 1px solid #e1e1e1;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .argument-item {
+            margin: 6px 0;
+            padding: 8px;
+            background: white;
+            border: 1px solid #f0f0f0;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .argument-item:hover {
+            border-color: #d1d1d1;
+            background: #f9f9f9;
+        }
+
+        .argument-name {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-weight: 600;
+            color: #d73a49;
+            font-size: 13px;
+        }
+
+        .argument-description {
+            color: #666;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .option-header {
+            display: flex;
+            color: #aaa;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .option-main {
+            flex: 1;
+        }
+        .non-expanding-text {
+            padding-left: 1.5em;
+        }
+
+        .expand-triangle {
+            width: 16px;
+            height: 16px;
+            margin-right: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .expand-triangle:hover {
+            color: #333;
+        }
+
+        .expand-triangle.expanded {
+            transform: rotate(90deg);
+        }
+
+        .tree-item {
+            padding: 8px 12px;
+            margin: 2px 0;
+            cursor: pointer;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            position: relative;
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            user-select: none;
+        }
+
+        .tree-item:hover {
+            background: #f0f0f0;
+            border-color: #d1d1d1;
+        }
+
+        .tree-item.selected {
+            background: #007acc;
+            color: white !important;
+        }
+
+        .tree-item.level-0 {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .tree-item.level-1 {
+            margin-left: 16px;
+            color: #666;
+        }
+
+        .tree-item.level-2 {
+            margin-left: 32px;
+            color: #888;
+            font-size: 13px;
+        }
+
+        .tree-children {
+            display: none;
+        }
+
+        .tree-children.expanded {
+            display: block;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+
+        .option-item {
+            padding: 12px;
+            margin: 4px 0;
+            /*border: 1px solid #f0f0f0;*/
+            /*border-radius: 4px;*/
+        }
+
+        .option-item-expandable {
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid #f0f0f0;
+            border-radius: 4px;
+        }
+
+
+        .option-item:hover {
+            border-color: #d1d1d1;
+            background: #fafafa;
+        }
+
+        .option-name {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-weight: 600;
+            font-size: 14px;
+            color: #007acc;
+        }
+
+        .option-description {
+            color: #666;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .option-full-doc {
+            margin-top: 8px;
+            background: #f8f8f8;
+            border-radius: 4px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .option-full-doc.expanded {
+            display: block;
+        }
+
+        .option-short {
+            color: #ac7acc;
+        }
+
+        .no-selection {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            margin-top: 40px;
+        }
+
+        .usage-options {
+            color: #ac7acc;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search commands..." id="searchInput">
+            <button class="btn btn-primary" onclick="performSearch()">Search</button>
+            <button class="btn" onclick="explainCommand()">Explain</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="column">
+            <div class="column-header">Commands</div>
+            <div class="column-content" id="commandTree">
+                {{ command | safe }}
+<!--                <div class="tree-item level-0 selected expandable expanded" onclick="selectCommand('git', this)" data-command="git">-->
+<!--                    git-->
+<!--                </div>-->
+<!--                <div class="tree-children expanded">-->
+<!--                    <div class="tree-item level-1" onclick="selectCommand('git-add', this)" data-command="git-add">-->
+<!--                        add-->
+<!--                    </div>-->
+<!--                    <div class="tree-item level-1" onclick="selectCommand('git-commit', this)" data-command="git-commit">-->
+<!--                        commit-->
+<!--                    </div>-->
+<!--                    <div class="tree-item level-1 expandable" onclick="toggleExpand(this); selectCommand('git-config', this)" data-command="git-config">-->
+<!--                        config-->
+<!--                    </div>-->
+<!--                    <div class="tree-children">-->
+<!--                        <div class="tree-item level-2" onclick="selectCommand('git-config-get', this)" data-command="git-config-get">-->
+<!--                            get-->
+<!--                        </div>-->
+<!--                        <div class="tree-item level-2" onclick="selectCommand('git-config-set', this)" data-command="git-config-set">-->
+<!--                            set-->
+<!--                        </div>-->
+<!--                        <div class="tree-item level-2" onclick="selectCommand('git-config-list', this)" data-command="git-config-list">-->
+<!--                            list-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="tree-item level-1" onclick="selectCommand('git-push', this)" data-command="git-push">-->
+<!--                        push-->
+<!--                    </div>-->
+<!--                    <div class="tree-item level-1" onclick="selectCommand('git-pull', this)" data-command="git-pull">-->
+<!--                        pull-->
+<!--                    </div>-->
+<!--                </div>-->
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="column-header">Options</div>
+            <div class="column-content" id="optionsPanel">
+                <!-- Command Info Section -->
+                <div class="info-section">
+                    <div class="info-header">
+                        Command Info
+                    </div>
+                    <div class="info-content" id="commandInfo">
+                        <div class="info-brief">Git is a distributed version control system</div>
+                        <div class="command-signature">git [--version] [--help] [command]</div>
+                        <div style="margin-top: 8px;">
+                            Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arguments Section -->
+                <div class="info-section">
+                    <div class="info-header">
+                        Arguments
+                    </div>
+                    <div class="info-content" id="argumentsInfo">
+                        <div class="argument-item" onclick="expandArgument(this)">
+                            <div class="argument-name">[command]</div>
+                            <div class="argument-description">The Git command to execute</div>
+                            <div class="option-full-doc">
+                                Optional command to execute. Common commands include add, commit, push, pull, clone, etc.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Options Section -->
+                <div id="categoryList"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const commandData = {{ command_json | safe }};
+
+    function toggleExpand(event, triangleElement) {
+        event.stopPropagation();
+
+        const treeItem = triangleElement.parentElement;
+        const childrenContainer = treeItem.nextElementSibling;
+        const commandId = treeItem.getAttribute('data-command');
+
+        if (!childrenContainer || !childrenContainer.classList.contains('tree-item-children')) {
+            return;
+        }
+
+        const isExpanded = triangleElement.classList.contains('expanded');
+
+        if (isExpanded) {
+            // Collapse
+            triangleElement.classList.remove('expanded');
+            childrenContainer.classList.add('hidden');
+            expansionState[commandId] = false;
+        } else {
+            // Expand
+            triangleElement.classList.add('expanded');
+            childrenContainer.classList.remove('hidden');
+            expansionState[commandId] = true;
+        }
+    }
+
+
+    function selectCommand(command, element) {
+        // Remove selection from all items
+        document.querySelectorAll('.tree-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+
+        // Add selection to clicked item
+        element.classList.add('selected');
+
+        showCommandDetails(command);
+    }
+
+    function showCommandDetails(command) {
+        const data = commandData[command];
+
+        if (!data) {
+            document.getElementById('commandInfo').innerHTML = '<div class="no-selection">No information available</div>';
+            document.getElementById('argumentsInfo').innerHTML = '<div class="no-selection">No arguments</div>';
+            document.getElementById('optionsList').innerHTML = '<div class="no-selection">No options available</div>';
+            return;
+        }
+
+        const usages = data.usages.map(usage => {
+            return `<div class="command-signature">${usage}</div>`;
+        }).join('');
+
+        let desc = "";
+        if (data.description) {
+            desc = `<div style="margin-top: 8px;">${data.description}</div>`
+        }
+
+        // Update command info
+        document.getElementById('commandInfo').innerHTML = `
+                 <div class="info-brief">${data.brief}</div>
+                ${usages} ${desc}
+            `;
+
+        /*
+        // Update arguments
+        if (data.arguments.length === 0) {
+            document.getElementById('argumentsInfo').innerHTML = '<div class="no-selection">No arguments</div>';
+        } else {
+            document.getElementById('argumentsInfo').innerHTML = data.arguments.map(arg => `
+                    <div class="argument-item" onclick="expandArgument(this)">
+                        <div class="argument-name">${arg.name}</div>
+                        <div class="argument-description">${arg.desc}</div>
+                        <div class="option-full-doc">
+                            ${arg.fullDoc}
+                        </div>
+                    </div>
+                `).join('');
+        }*/
+
+        // <div className="info-section">
+        //     <div className="info-header">
+        //         Options
+        //     </div>
+        //     <div className="info-content" id="optionsList">
+        //         <div className="option-item" onClick="toggleFullDoc(this)">
+        //             <div className="option-name">--version</div>
+        //             <div className="option-description">Show version information</div>
+        //             <div className="option-full-doc">
+        //                 Displays the Git version number and build information.
+        //             </div>
+        //         </div>
+        //         <div className="option-item" onClick="toggleFullDoc(this)">
+        //             <div className="option-name">--help</div>
+        //             <div className="option-description">Show help message</div>
+        //             <div className="option-full-doc">
+        //                 Shows the help message with available commands and common options.
+        //             </div>
+        //         </div>
+        //     </div>
+        // </div>
+
+        if (data.categories.length === 0) {
+            document.getElementById('categoryList').innerHTML = '';
+        } else {
+            document.getElementById('categoryList').innerHTML = data.categories.map(category => {
+                const items = category.options.map(option => {
+                     let desc = "";
+                     let className = "";
+                     let showMore = "";
+                     if (option.description) {
+                         desc = `<div class="option-full-doc">${option.description}</div>`;
+                         className = "option-item-expandable";
+                         showMore = `
+                             <div class="show-more-indicator">
+                                 Show more
+                             </div>`;
+                     }
+                    let short = "";
+                     if (option.short) {
+                         short = `<span class="option-short">${option.short},</span> `
+                     };
+                    return `<div class="option-item ${className}" onClick="toggleFullDoc(this)">
+                    <div class="option-header">
+                        <div class="option-main">
+                          <div class="option-name">${short}${option.long}</div>
+                          <div class="option-description">${option.brief}</div>
+                        </div>
+                        ${showMore}
+                    </div>
+                    ${desc}
+                </div>
+                `
+                    }
+                )
+                return `<div class="info-section">
+                        <div class="info-header">
+                            ${category.title}
+                        </div>
+                        <div class="info-content" id="optionsList">
+                            ${items.join("")}
+                        </div>
+                    </div>`
+                }
+            )
+            // document.getElementById('optionsList').innerHTML = data.options.map(option => `
+            //         <div class="option-item" onclick="toggleFullDoc(this)">
+            //             <div class="option-name">${option.name}</div>
+            //             <div class="option-description">${option.desc}</div>
+            //             <div class="option-full-doc">
+            //                 ${option.fullDoc}
+            //             </div>
+            //         </div>
+            //     `).join('');
+        }
+    }
+
+    function expandArgument(element) {
+        const fullDoc = element.querySelector('.option-full-doc');
+        const isExpanded = fullDoc.classList.contains('expanded');
+
+        // Close all other expanded docs
+        document.querySelectorAll('.option-full-doc.expanded').forEach(doc => {
+            doc.classList.remove('expanded');
+        });
+
+        // Toggle current doc
+        if (!isExpanded) {
+            fullDoc.classList.add('expanded');
+        }
+    }
+
+    function toggleFullDoc(element) {
+        const fullDoc = element.querySelector('.option-full-doc');
+        const isExpanded = fullDoc.classList.contains('expanded');
+
+        // Close all other expanded docs
+        document.querySelectorAll('.option-full-doc.expanded').forEach(doc => {
+            doc.classList.remove('expanded');
+        });
+
+        // Toggle current doc
+        if (!isExpanded) {
+            fullDoc.classList.add('expanded');
+        }
+    }
+
+    function performSearch() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+        if (!searchTerm) {
+            alert('Please enter a search term');
+            return;
+        }
+
+        let results = [];
+
+        Object.keys(commandData).forEach(command => {
+            const data = commandData[command];
+            if (command.toLowerCase().includes(searchTerm) ||
+                data.info.toLowerCase().includes(searchTerm)) {
+                results.push(`Command: ${command}`);
+            }
+
+            data.options.forEach(option => {
+                if (option.name.toLowerCase().includes(searchTerm) ||
+                    option.desc.toLowerCase().includes(searchTerm)) {
+                    results.push(`${command} ${option.name}`);
+                }
+            });
+        });
+
+        if (results.length > 0) {
+            alert('Found:\n' + results.slice(0, 8).join('\n'));
+        } else {
+            alert('No results found');
+        }
+    }
+
+    function explainCommand() {
+        const data = commandData[currentCommand];
+        if (data) {
+            alert(`${currentCommand}\n\n${data.info}`);
+        } else {
+            alert('No explanation available.');
+        }
+    }
+
+    // Initialize
+    showCommandDetails('git');
+</script>
+</body>
+</html>

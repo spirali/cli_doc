@@ -1,0 +1,111 @@
+use askama::filters::{Escaper, Html};
+
+#[derive(Debug)]
+#[cfg_attr(test, derive(PartialEq, Eq))]
+pub struct RichText {
+    pub parts: Vec<RichTextPart>,
+}
+
+#[derive(Debug)]
+#[cfg_attr(test, derive(PartialEq, Eq))]
+pub enum RichTextPart {
+    Text(String),
+    Ul(Vec<String>),
+    Config { key: String, value: String }
+}
+
+impl RichTextPart {
+    pub fn to_html_into(&self, out: &mut String) {
+        let html = Html::default();
+        match self {
+            RichTextPart::Text(s) => {
+                out.push_str("<p>");
+                html.write_escaped_str(&mut *out, &s).unwrap();
+                out.push_str("</p>");
+            }
+            RichTextPart::Ul(items) => {
+                out.push_str("<ul>");
+                for item in items {
+                    out.push_str("<li>");
+                    html.write_escaped_str(&mut *out, &item).unwrap();
+                    out.push_str("</li>");
+                }
+                out.push_str("</ul>");
+            }
+            RichTextPart::Config { key, value } => {
+                out.push_str("<p>[");
+                html.write_escaped_str(&mut *out, &key).unwrap();
+                out.push(':');
+                html.write_escaped_str(&mut *out, &value).unwrap();
+                out.push_str("]</p>");
+            }
+        }
+    }
+}
+
+impl RichText {
+    pub fn new() -> Self {
+        RichText { parts: Vec::new() }
+    }
+
+    pub fn from_simple_line(line: String) -> RichText {
+        let mut text = RichText::new();
+        text.parts.push(RichTextPart::Text(line));
+        text
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.parts.is_empty()
+    }
+
+    pub fn add_lines(&mut self, lines: &[&str]) {
+        let mut current = None;
+        'main: for line in lines {
+            for pattern in ["* ", "- "] {
+                if let Some(t) = line.strip_prefix(pattern) {
+                    if let Some(RichTextPart::Ul(ref mut items)) = current {
+                        items.push(t.to_string())
+                    } else {
+                        if let Some(item) = current {
+                            self.parts.push(item);
+                        }
+                        current = Some(RichTextPart::Ul(vec![t.to_string()]));
+                    }
+                    continue 'main;
+                }
+            }
+            if let Some(t) = line.strip_prefix('[') {
+                if let Some((left, right)) = t.split_once(':') {
+                    if let Some(item) = current {
+                        self.parts.push(item);
+                    }
+                    current = Some(RichTextPart::Config {
+                        key: left.trim().to_string(),
+                        value: right.trim().to_string()
+                    });
+                    continue 'main;
+                }
+            }
+            if let Some(RichTextPart::Text(ref mut text)) = current {
+                text.push(' ');
+                text.push_str(line);
+            } else {
+                if let Some(item) = current {
+                    self.parts.push(item);
+                }
+                current = Some(RichTextPart::Text(line.to_string()));
+            }
+        }
+        if let Some(item) = current {
+            self.parts.push(item);
+        }
+    }
+
+    pub fn to_html(&self) -> String {
+        let mut s = String::new();
+        for part in &self.parts {
+            part.to_html_into(&mut s);
+        }
+        s
+    }
+}

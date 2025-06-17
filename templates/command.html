@@ -1,0 +1,14 @@
+<div class="tree-item level-{% if depth > 2 %}2{% else %}{{depth}}{% endif %} {% if depth == 0 %}selected expanded{% endif %}" onclick="selectCommand('c{{ id }}', this)" data-command="{{ id }}">
+    {%- if !subcommands.is_empty() -%}
+    <div class="expand-triangle {% if depth == 0 %}expanded{% endif %}" onclick="toggleExpand(event, this)">▶</div>
+    <div class="command-text">{{ name }}</div>
+    {%- else -%}
+    <div class="command-text non-expanding-text">{{ name }}</div>
+    {%- endif -%}
+
+</div>
+<div class="tree-item-children {% if depth > 0 %}hidden{% endif %}">
+{% for child in subcommands %}
+    {{ child.render().unwrap() }}
+{% endfor %}
+</div>
