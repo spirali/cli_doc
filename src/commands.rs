@@ -1,10 +1,10 @@
+use std::collections::HashSet;
 use crate::text::RichText;
 use askama::filters::{Escaper, Html};
 
 pub type CommandId = u32;
 
-#[derive(Debug)]
-#[cfg_attr(test, derive(PartialEq, Eq))]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub struct OptionDesc {
     pub short: Option<String>,
     pub long: String,
@@ -102,6 +102,28 @@ pub struct CommandDesc {
     pub name: String,
     pub doc: CommandDoc,
     pub commands: Vec<CommandDesc>,
+}
+
+impl CommandDesc {
+    fn prune_repeated_options_helper(&mut self, parent_options: &HashSet<&OptionDesc>) {
+        self.doc.option_categories.retain_mut(|category| {
+            category.options.retain(|option| !parent_options.contains(option));
+            !category.options.is_empty()
+        });
+        let mut my_options = parent_options.clone();
+        for category in &self.doc.option_categories {
+            for option in &category.options {
+                my_options.insert(option);
+            }
+        }
+
+        for command in &mut self.commands {
+            command.prune_repeated_options_helper(&my_options);
+        }
+    }
+    pub fn prune_repeated_options(&mut self) {
+        self.prune_repeated_options_helper(&HashSet::new());
+    }
 }
 
 #[derive(Debug)]

@@ -1,13 +1,11 @@
 use askama::filters::{Escaper, Html};
 
-#[derive(Debug)]
-#[cfg_attr(test, derive(PartialEq, Eq))]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub struct RichText {
     pub parts: Vec<RichTextPart>,
 }
 
-#[derive(Debug)]
-#[cfg_attr(test, derive(PartialEq, Eq))]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub enum RichTextPart {
     Text(String),
     Ul(Vec<String>),

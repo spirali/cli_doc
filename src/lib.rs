@@ -9,9 +9,10 @@ use std::path::Path;
 
 pub fn create_cheatsheet(path: &Path) -> anyhow::Result<String> {
     use colored::Colorize;
-    let cmd = collect_program_info(path)?;
+    let mut program = collect_program_info(path)?;
+    program.command.prune_repeated_options();
     println!("Creating templates ...");
-    render_html(&cmd)
+    render_html(&program)
 }
 
 #[cfg(test)]
