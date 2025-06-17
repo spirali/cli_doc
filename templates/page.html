@@ -280,17 +280,21 @@
             /*border-radius: 4px;*/
         }
 
+        .option-item:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
         .option-item-expandable {
             cursor: pointer;
             transition: all 0.15s ease;
-            border: 1px solid #f0f0f0;
-            border-radius: 4px;
+            /*border: 1px solid #f0f0f0;*/
+            /*border-radius: 4px;*/
         }
 
 
         .option-item:hover {
             border-color: #d1d1d1;
-            background: #fafafa;
+            background: #e5e5e5;
         }
 
         .option-name {
@@ -486,9 +490,9 @@
         const data = commandData[command];
 
         if (!data) {
-            document.getElementById('commandInfo').innerHTML = '<div class="no-selection">No information available</div>';
-            document.getElementById('argumentsInfo').innerHTML = '<div class="no-selection">No arguments</div>';
-            document.getElementById('optionsList').innerHTML = '<div class="no-selection">No options available</div>';
+            // document.getElementById('commandInfo').innerHTML = '<div class="no-selection">No information available</div>';
+            // document.getElementById('argumentsInfo').innerHTML = '<div class="no-selection">No arguments</div>';
+            // document.getElementById('optionsList').innerHTML = '<div class="no-selection">No options available</div>';
             return;
         }
 
@@ -577,7 +581,7 @@
                 </div>
                 `
                     }
-                )
+                );
                 return `<div class="info-section">
                         <div class="info-header">
                             ${category.title}
@@ -587,7 +591,7 @@
                         </div>
                     </div>`
                 }
-            )
+            ).join("");
             // document.getElementById('optionsList').innerHTML = data.options.map(option => `
             //         <div class="option-item" onclick="toggleFullDoc(this)">
             //             <div class="option-name">${option.name}</div>
