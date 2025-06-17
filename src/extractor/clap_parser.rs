@@ -30,9 +30,9 @@ impl ClapParser {
             if let Some(s) = sections.get(intro_section) {
                 if s.first_line().starts_with("Usage: ") {
                     let usage_content = s.first_line().strip_prefix("Usage: ").unwrap();
-                    let mut usage = vec![usage_content.to_string()];
-                    for s in s.subsections() {
-                        usage.push(s.paragraph());
+                    let mut usage = vec![usage_content];
+                    for s in s.flatten_child_lines() {
+                        usage.push(s);
                     }
                     break usage;
                 }
@@ -51,7 +51,7 @@ impl ClapParser {
             CommandDoc {
                 brief,
                 description: if desc.is_empty() { None } else { Some(desc) },
-                usage: usage.iter().map(|s| parse_usage(s.as_str())).collect(),
+                usage: usage.iter().map(|s| parse_usage(s)).collect(),
                 arguments,
                 option_categories,
             },
@@ -960,4 +960,97 @@ Arguments:
         "#);
         assert!(commands.is_empty());
     }
+
+    #[test]
+    fn test_parse_clap_cargo_add_usage() {
+        let text = "Add dependencies to a Cargo.toml manifest file
+
+Usage: cargo add [OPTIONS] <DEP>[@<VERSION>] ...
+       cargo add [OPTIONS] --path <PATH> ...
+       cargo add [OPTIONS] --git <URL> ...
+        ";
+
+        let (doc, commands) = parse_clap(text);
+        assert_debug_snapshot!(doc, @r#"
+        CommandDoc {
+            brief: RichText {
+                parts: [
+                    Text(
+                        "Add dependencies to a Cargo.toml manifest file",
+                    ),
+                ],
+            },
+            description: None,
+            usage: [
+                Usage {
+                    parts: [
+                        Command(
+                            "cargo",
+                        ),
+                        Command(
+                            "add",
+                        ),
+                        Option(
+                            "[OPTIONS]",
+                        ),
+                        Argument(
+                            "<DEP>[@<VERSION>]",
+                        ),
+                        Command(
+                            "...",
+                        ),
+                    ],
+                },
+                Usage {
+                    parts: [
+                        Command(
+                            "cargo",
+                        ),
+                        Command(
+                            "add",
+                        ),
+                        Option(
+                            "[OPTIONS]",
+                        ),
+                        Command(
+                            "--path",
+                        ),
+                        Argument(
+                            "<PATH>",
+                        ),
+                        Command(
+                            "...",
+                        ),
+                    ],
+                },
+                Usage {
+                    parts: [
+                        Command(
+                            "cargo",
+                        ),
+                        Command(
+                            "add",
+                        ),
+                        Option(
+                            "[OPTIONS]",
+                        ),
+                        Command(
+                            "--git",
+                        ),
+                        Argument(
+                            "<URL>",
+                        ),
+                        Command(
+                            "...",
+                        ),
+                    ],
+                },
+            ],
+            arguments: [],
+            option_categories: [],
+        }
+        "#);
+        assert!(commands.is_empty());
+    }
+
 }
