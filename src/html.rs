@@ -13,6 +13,7 @@ struct PageTemplate<'a> {
     version: &'a str,
     command: CommandTemplate<'a>,
     command_json: String,
+    generator: String,
 }
 
 #[derive(Template)]
@@ -141,6 +142,7 @@ pub fn render_html(program: &ProgramDesc) -> anyhow::Result<String> {
         version: &program.version,
         command: command_template,
         command_json: serde_json::to_string(&command_jsons)?,
+        generator: format!("cli-doc {}", env!("CARGO_PKG_VERSION")),
     }
     .render()?)
 }
