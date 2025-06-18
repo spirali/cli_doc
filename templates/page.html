@@ -136,10 +136,6 @@
             color: #555;
         }
 
-        /*.info-content.collapsed {*/
-        /*    display: none;*/
-        /*}*/
-
         .info-brief {
             font-style: italic;
             color: #777;
@@ -420,23 +416,6 @@
         .search-highlight-command {
             background-color: #ffccaa !important;
         }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a1a1a1;
-        }
     </style>
 </head>
 <body>
@@ -466,44 +445,12 @@
             <div class="column-header">Commands</div>
             <div class="column-content" id="commandTree">
                 {{ command | safe }}
-<!--                <div class="tree-item level-0 selected expandable expanded" onclick="selectCommand('git', this)" data-command="git">-->
-<!--                    git-->
-<!--                </div>-->
-<!--                <div class="tree-children expanded">-->
-<!--                    <div class="tree-item level-1" onclick="selectCommand('git-add', this)" data-command="git-add">-->
-<!--                        add-->
-<!--                    </div>-->
-<!--                    <div class="tree-item level-1" onclick="selectCommand('git-commit', this)" data-command="git-commit">-->
-<!--                        commit-->
-<!--                    </div>-->
-<!--                    <div class="tree-item level-1 expandable" onclick="toggleExpand(this); selectCommand('git-config', this)" data-command="git-config">-->
-<!--                        config-->
-<!--                    </div>-->
-<!--                    <div class="tree-children">-->
-<!--                        <div class="tree-item level-2" onclick="selectCommand('git-config-get', this)" data-command="git-config-get">-->
-<!--                            get-->
-<!--                        </div>-->
-<!--                        <div class="tree-item level-2" onclick="selectCommand('git-config-set', this)" data-command="git-config-set">-->
-<!--                            set-->
-<!--                        </div>-->
-<!--                        <div class="tree-item level-2" onclick="selectCommand('git-config-list', this)" data-command="git-config-list">-->
-<!--                            list-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    <div class="tree-item level-1" onclick="selectCommand('git-push', this)" data-command="git-push">-->
-<!--                        push-->
-<!--                    </div>-->
-<!--                    <div class="tree-item level-1" onclick="selectCommand('git-pull', this)" data-command="git-pull">-->
-<!--                        pull-->
-<!--                    </div>-->
-<!--                </div>-->
             </div>
         </div>
 
         <div class="column">
             <div class="column-header">Options</div>
             <div class="column-content" id="optionsPanel">
-                <!-- Command Info Section -->
                 <div class="info-section">
                     <div class="info-header">
                         Command Info
@@ -517,9 +464,7 @@
                     </div>
                 </div>
 
-                <!-- Arguments Section -->
                 <div id="argumentsInfo"></div>
-                <!-- Options Section -->
                 <div id="categoryList"></div>
             </div>
         </div>

@@ -59,26 +59,10 @@ function showCommandDetails(command) {
         desc = `<div style="margin-top: 8px;">${data.description}</div>`
     }
 
-    // Update command info
     document.getElementById('commandInfo').innerHTML = `
                  <div class="info-brief">${data.brief}</div>
                 ${usages} ${desc}
             `;
-
-    // <div className="info-section">
-    //     <div className="info-header">
-    //         Arguments
-    //     </div>
-    //     <div className="info-content" id="argumentsInfo">
-    //         <div className="argument-item" onClick="expandArgument(this)">
-    //             <div className="argument-name">[command]</div>
-    //             <div className="argument-description">The Git command to execute</div>
-    //             <div className="option-full-doc">
-    //                 Optional command to execute. Common commands include add, commit, push, pull, clone, etc.
-    //             </div>
-    //         </div>
-    //     </div>
-    // </div>
 
     if (data.arguments.length === 0) {
         document.getElementById('argumentsInfo').innerHTML = '';
@@ -155,15 +139,6 @@ function showCommandDetails(command) {
                         </div>`
             }
         ).join("");
-        // document.getElementById('optionsList').innerHTML = data.options.map(option => `
-        //         <div class="option-item" onclick="toggleFullDoc(this)">
-        //             <div class="option-name">${option.name}</div>
-        //             <div class="option-description">${option.desc}</div>
-        //             <div class="option-full-doc">
-        //                 ${option.fullDoc}
-        //             </div>
-        //         </div>
-        //     `).join('');
     }
 }
 
@@ -171,12 +146,10 @@ function expandArgument(element) {
     const fullDoc = element.querySelector('.option-full-doc');
     const isExpanded = fullDoc.classList.contains('expanded');
 
-    // Close all other expanded docs
     document.querySelectorAll('.option-full-doc.expanded').forEach(doc => {
         doc.classList.remove('expanded');
     });
 
-    // Toggle current doc
     if (!isExpanded) {
         fullDoc.classList.add('expanded');
     }
@@ -186,12 +159,10 @@ function toggleFullDoc(element) {
     const fullDoc = element.querySelector('.option-full-doc');
     const isExpanded = fullDoc.classList.contains('expanded');
 
-    // Close all other expanded docs
     document.querySelectorAll('.option-full-doc.expanded').forEach(doc => {
         doc.classList.remove('expanded');
     });
 
-    // Toggle current doc
     if (!isExpanded) {
         fullDoc.classList.add('expanded');
     }
