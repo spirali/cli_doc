@@ -2,6 +2,9 @@
 name = "cli_doc"
 version = "0.1.0"
 edition = "2024"
+authors = ["Ada Böhm <ada@kreatrix.org>"]
+repository = "https://github.com/spirali/cli-doc"
+description = "Documentation generator for CLI"
 
 [dependencies]
 clap = { version = "4.5", features = ["derive"]}

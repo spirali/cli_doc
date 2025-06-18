@@ -1,4 +1,4 @@
-# `cli_doc` - Documentation generator for `clap`-like CLI 
+# `cli_doc` - Documentation generator for CLI
 
 `cli_doc` generates HTML documentation for an application's command-line interface. 
 
