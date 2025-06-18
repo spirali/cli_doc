@@ -183,8 +183,9 @@ function performSearch() {
         return;
     }
 
-    let results = [];
-    Object.keys(commandData).forEach(command => {
+    const results = [];
+    const keys = Object.keys(commandData).toSorted();
+    keys.forEach(command => {
         const data = commandData[command];
         if (data.name.toLowerCase().includes(searchTerm)) {
             results.push({command: command});
@@ -235,7 +236,6 @@ function navigateSearch(direction) {
         } else {
             elementId = commandNodeId;
         }
-        console.log(elementId);
         let element = document.getElementById(elementId);
         element.classList.add("search-highlight-command");
         element.scrollIntoView({
