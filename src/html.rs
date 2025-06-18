@@ -26,6 +26,7 @@ struct CommandTemplate<'a> {
 
 #[derive(Serialize)]
 struct OptionJson<'a> {
+    id: String,
     short: Option<&'a str>,
     long: String,
     brief: String,
@@ -48,6 +49,7 @@ struct CategoryJson<'a> {
 #[derive(Serialize)]
 struct CommandJson<'a> {
     name: String,
+    parent: Option<String>,
     brief: String,
     description: Option<String>,
     usages: Vec<String>,
@@ -56,9 +58,11 @@ struct CommandJson<'a> {
 }
 
 impl<'a> CommandJson<'a> {
-    pub fn new(desc: &'a CommandDesc) -> Self {
+    pub fn new(desc: &'a CommandDesc, parent: Option<&str>) -> Self {
+        let mut option_id = 0;
         CommandJson {
             name: desc.name.to_string(),
+            parent: parent.map(|x| x.to_string()),
             brief: desc.doc.brief.to_html(),
             description: desc.doc.description.as_ref().map(|t| t.to_html()),
             usages: desc.doc.usage.iter().map(|u| u.to_html()).collect(),
@@ -85,6 +89,7 @@ impl<'a> CommandJson<'a> {
                         .options
                         .iter()
                         .map(|o| OptionJson {
+                            id: { option_id += 1; format!("o{}-{}", desc.id, option_id) },
                             short: o.short.as_deref(),
                             long: escape_html(&o.long),
                             brief: o.brief.to_html(),
@@ -97,12 +102,12 @@ impl<'a> CommandJson<'a> {
     }
 }
 
-fn build_command_json<'a>(command: &'a CommandDesc, out: &mut HashMap<String, CommandJson<'a>>) {
+fn build_command_json<'a>(command: &'a CommandDesc, parent: Option<&str>, out: &mut HashMap<String, CommandJson<'a>>) {
     let id = format!("c{}", command.id);
-    out.insert(id, CommandJson::new(command));
     for c in &command.commands {
-        build_command_json(c, out);
+        build_command_json(c, Some(id.as_str()), out);
     }
+    out.insert(id, CommandJson::new(command, parent));
 }
 
 fn escape_html(s: &str) -> String {
@@ -129,7 +134,7 @@ fn build_command_tree<'a, 'b>(command: &'a CommandDesc, depth: u32) -> CommandTe
 pub fn render_html(program: &ProgramDesc) -> anyhow::Result<String> {
     let command_template = build_command_tree(&program.command, 0);
     let mut command_jsons: HashMap<String, CommandJson> = Default::default();
-    build_command_json(&program.command, &mut command_jsons);
+    build_command_json(&program.command, None, &mut command_jsons);
 
     Ok(PageTemplate {
         project_name: &program.command.name,

@@ -34,10 +34,11 @@
             margin-bottom: 10px;
         }
 
-        .search-container {
+        .search-container {;
             display: flex;
             gap: 8px;
             align-items: center;
+            position: relative;
         }
 
         .search-input {
@@ -360,6 +361,65 @@
             font-size: 16px;
         }
 
+        .search-results-widget {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d1d1;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin-top: 4px;
+            display: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .search-results-widget.visible {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-counter {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+            min-width: 30px;
+        }
+
+        .search-nav-buttons {
+            display: flex;
+            gap: 2px;
+        }
+
+        .search-nav-btn {
+            padding: 4px 6px;
+            border: 1px solid #d1d1d1;
+            border-radius: 3px;
+            background: white;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+        }
+
+        .search-nav-btn:hover:not(:disabled) {
+            background: #f5f5f5;
+        }
+
+        .search-nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .search-highlight-command {
+            background-color: #ffccaa !important;
+        }
+
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -382,9 +442,17 @@
 <div class="container">
     <div class="header">
         <div class="search-container">
-            <input type="text" class="search-input" placeholder="Search commands..." id="searchInput">
+            <input type="text" class="search-input" placeholder="Search commands..." id="searchInput" oninput="resetSearch()">
             <button class="btn btn-primary" onclick="performSearch()">Search</button>
-            <button class="btn" onclick="explainCommand()">Explain</button>
+
+            <div class="search-results-widget" id="searchWidget">
+                <div class="search-counter" id="searchCounter">1/4</div>
+                <div class="search-nav-buttons">
+                    <button class="search-nav-btn" id="searchPrev" onclick="navigateSearch(-1)" title="Previous result">↑</button>
+                    <button class="search-nav-btn" id="searchNext" onclick="navigateSearch(1)" title="Next result">↓</button>
+                    <button class="search-nav-btn" onclick="resetSearch()" title="Clear search">×</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -459,246 +527,11 @@
 
 <script>
     const commandData = {{ command_json | safe }};
-
-    function toggleExpand(event, triangleElement) {
-        event.stopPropagation();
-
-        const treeItem = triangleElement.parentElement;
-        const childrenContainer = treeItem.nextElementSibling;
-        const commandId = treeItem.getAttribute('data-command');
-
-        if (!childrenContainer || !childrenContainer.classList.contains('tree-item-children')) {
-            return;
-        }
-
-        const isExpanded = triangleElement.classList.contains('expanded');
-
-        if (isExpanded) {
-            // Collapse
-            triangleElement.classList.remove('expanded');
-            childrenContainer.classList.add('hidden');
-            expansionState[commandId] = false;
-        } else {
-            // Expand
-            triangleElement.classList.add('expanded');
-            childrenContainer.classList.remove('hidden');
-            expansionState[commandId] = true;
-        }
-    }
-
-
-    function selectCommand(command, element) {
-        // Remove selection from all items
-        document.querySelectorAll('.tree-item').forEach(item => {
-            item.classList.remove('selected');
-        });
-
-        // Add selection to clicked item
-        element.classList.add('selected');
-
-        showCommandDetails(command);
-    }
-
-    function showCommandDetails(command) {
-        const data = commandData[command];
-
-        if (!data) {
-            // document.getElementById('commandInfo').innerHTML = '<div class="no-selection">No information available</div>';
-            // document.getElementById('argumentsInfo').innerHTML = '<div class="no-selection">No arguments</div>';
-            // document.getElementById('optionsList').innerHTML = '<div class="no-selection">No options available</div>';
-            return;
-        }
-
-        const usages = data.usages.map(usage => {
-            return `<div class="command-signature">${usage}</div>`;
-        }).join('');
-
-        let desc = "";
-        if (data.description) {
-            desc = `<div style="margin-top: 8px;">${data.description}</div>`
-        }
-
-        // Update command info
-        document.getElementById('commandInfo').innerHTML = `
-                 <div class="info-brief">${data.brief}</div>
-                ${usages} ${desc}
-            `;
-
-        // <div className="info-section">
-        //     <div className="info-header">
-        //         Arguments
-        //     </div>
-        //     <div className="info-content" id="argumentsInfo">
-        //         <div className="argument-item" onClick="expandArgument(this)">
-        //             <div className="argument-name">[command]</div>
-        //             <div className="argument-description">The Git command to execute</div>
-        //             <div className="option-full-doc">
-        //                 Optional command to execute. Common commands include add, commit, push, pull, clone, etc.
-        //             </div>
-        //         </div>
-        //     </div>
-        // </div>
-
-        if (data.arguments.length === 0) {
-            document.getElementById('argumentsInfo').innerHTML = '';
-        } else {
-            let items = data.arguments.map(argument => {
-                let desc = "";
-                let className = "";
-                let showMore = "";
-                let onClick = "";
-                if (argument.description) {
-                    desc = `<div class="option-full-doc">${argument.description}</div>`;
-                    className = "option-item-expandable";
-                    showMore = '<div class="show-more-indicator">Show more</div>';
-                    onClick='onClick="toggleFullDoc(this)"';
-                }
-                return `<div class="option-item ${className}" ${onClick}">
-                    <div class="option-header">
-                        <div class="option-main">
-                          <div class="argument-name">${argument.name}</div>
-                          <div class="option-description">${argument.brief}</div>
-                        </div>
-                        ${showMore}
-                    </div>
-                    ${desc}
-                </div>`});
-                document.getElementById('argumentsInfo').innerHTML = `<div class="info-section">
-                    <div class="info-header">
-                        Arguments
-                    </div>
-                    <div class="info-content" id="optionsList">
-                        ${items.join("")}
-                    </div>
-                </div>`;
-            }
-
-                if (data.categories.length === 0) {
-                document.getElementById('categoryList').innerHTML = '';
-            } else {
-
-                document.getElementById('categoryList').innerHTML = data.categories.map(category => {
-                        const items = category.options.map(option => {
-                                let desc = "";
-                                let className = "";
-                                let showMore = "";
-                                let onClick = "";
-                                if (option.description) {
-                                    desc = `<div class="option-full-doc">${option.description}</div>`;
-                                    className = "option-item-expandable";
-                                    showMore = '<div class="show-more-indicator">Show more</div>';
-                                    onClick='onClick="toggleFullDoc(this)"';
-                                }
-                                let short = "";
-                                if (option.short) {
-                                    short = `<span class="option-short">${option.short},</span> `
-                                }
-                                return `<div class="option-item ${className}" ${onClick}">
-                                    <div class="option-header">
-                                        <div class="option-main">
-                                          <div class="option-name">${short}${option.long}</div>
-                                          <div class="option-description">${option.brief}</div>
-                                        </div>
-                                        ${showMore}
-                                    </div>
-                                    ${desc}
-                                </div>`
-                            });
-                        return `<div class="info-section">
-                            <div class="info-header">
-                                ${category.title}
-                            </div>
-                            <div class="info-content" id="optionsList">
-                                ${items.join("")}
-                            </div>
-                        </div>`
-                    }
-                ).join("");
-                // document.getElementById('optionsList').innerHTML = data.options.map(option => `
-                //         <div class="option-item" onclick="toggleFullDoc(this)">
-                //             <div class="option-name">${option.name}</div>
-                //             <div class="option-description">${option.desc}</div>
-                //             <div class="option-full-doc">
-                //                 ${option.fullDoc}
-                //             </div>
-                //         </div>
-                //     `).join('');
-            }
-                }
-
-                function expandArgument(element) {
-                const fullDoc = element.querySelector('.option-full-doc');
-                const isExpanded = fullDoc.classList.contains('expanded');
-
-                // Close all other expanded docs
-                document.querySelectorAll('.option-full-doc.expanded').forEach(doc => {
-                doc.classList.remove('expanded');
-            });
-
-                // Toggle current doc
-                if (!isExpanded) {
-                fullDoc.classList.add('expanded');
-            }
-            }
-
-                function toggleFullDoc(element) {
-                const fullDoc = element.querySelector('.option-full-doc');
-                const isExpanded = fullDoc.classList.contains('expanded');
-
-                // Close all other expanded docs
-                document.querySelectorAll('.option-full-doc.expanded').forEach(doc => {
-                doc.classList.remove('expanded');
-            });
-
-                // Toggle current doc
-                if (!isExpanded) {
-                fullDoc.classList.add('expanded');
-            }
-            }
-
-                function performSearch() {
-                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-
-                if (!searchTerm) {
-                alert('Please enter a search term');
-                return;
-            }
-
-                let results = [];
-
-                Object.keys(commandData).forEach(command => {
-                const data = commandData[command];
-                if (command.toLowerCase().includes(searchTerm) ||
-                data.info.toLowerCase().includes(searchTerm)) {
-                results.push(`Command: ${command}`);
-            }
-
-                data.options.forEach(option => {
-                if (option.name.toLowerCase().includes(searchTerm) ||
-                option.desc.toLowerCase().includes(searchTerm)) {
-                results.push(`${command} ${option.name}`);
-            }
-            });
-            });
-
-                if (results.length > 0) {
-                alert('Found:\n' + results.slice(0, 8).join('\n'));
-            } else {
-                alert('No results found');
-            }
-            }
-
-                function explainCommand() {
-                const data = commandData[currentCommand];
-                if (data) {
-                alert(`${currentCommand}\n\n${data.info}`);
-            } else {
-                alert('No explanation available.');
-            }
-            }
-
-                // Initialize
-                showCommandDetails('git');
+    let searchResults = null;
+    let searchIndex = 0;
+    let currentCommand = "c0";
+    {% include "script.js" %}
+    showCommandDetails('c0');
 </script>
 </body>
 </html>
