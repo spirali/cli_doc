@@ -1,7 +1,7 @@
 use clap::Parser;
 use cli_doc::create_html_doc;
 use colored::Colorize;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 /// Generator of documentation for CLI
 #[derive(Parser, Debug)]
@@ -17,6 +17,9 @@ pub fn main() -> anyhow::Result<()> {
     let args = Args::parse();
     let svg = create_html_doc(&args.program)?;
     std::fs::write(&args.output_filename, &svg)?;
-    println!("Output written into: {}", args.output_filename.display().to_string().green());
+    println!(
+        "Output written into: {}",
+        args.output_filename.display().to_string().green()
+    );
     Ok(())
 }

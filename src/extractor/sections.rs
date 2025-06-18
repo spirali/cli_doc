@@ -1,7 +1,4 @@
 use crate::text::RichText;
-use anyhow::bail;
-use std::borrow::Cow;
-use std::ops::Deref;
 // #[derive(Debug)]
 // pub(crate) struct ParsedSubsection<'a> {
 //     pub subsection_title: &'a str,
@@ -54,7 +51,7 @@ impl<'a> Section<'a> {
     pub fn extract_sections_upto_ident<'b, 'c>(
         &'b mut self,
         indent: usize,
-        mut out: &'c mut Vec<Section<'a>>,
+        out: &'c mut Vec<Section<'a>>,
     ) {
         self.subsections
             .extract_if(.., |s| s.indent < indent)
@@ -64,10 +61,6 @@ impl<'a> Section<'a> {
                 s.extract_sections_upto_ident(indent - i, out);
                 out.insert(idx, s);
             });
-    }
-
-    pub fn common_subsection_indent(&self) -> usize {
-        self.subsections.iter().map(|s| s.indent).min().unwrap_or(0)
     }
 
     pub fn as_rich_text_into(&self, out: &mut RichText) {
@@ -96,12 +89,6 @@ impl<'a> Section<'a> {
         )
     }
 
-    pub fn subsections_as_rich_text(&self) -> RichText {
-        let mut out = RichText::new();
-        self.subsections_as_rich_text_into(&mut out);
-        out
-    }
-
     fn subsections_as_rich_text_into(&self, out: &mut RichText) {
         for section in &self.subsections {
             out.add_lines(&section.paragraph);
@@ -128,7 +115,7 @@ impl<'a> LineReader<'a> {
     }
 
     pub fn current(&self) -> Option<&'a str> {
-        self.lines.get(self.idx).map(|s| *s)
+        self.lines.get(self.idx).copied()
     }
 
     pub fn next(&mut self) {
@@ -161,10 +148,8 @@ impl<'a> LineReader<'a> {
     }
 }
 
-fn parse_section(reader: &mut LineReader, section: &mut Section) {}
-
-fn read_sections<'a, 'b>(
-    reader: &'a mut LineReader<'b>,
+fn read_sections<'b>(
+    reader: &mut LineReader<'b>,
     base_indent: usize,
     level: usize,
 ) -> Vec<Section<'b>> {
@@ -199,13 +184,8 @@ pub(crate) fn parse_sections(input: &str) -> Vec<Section<'_>> {
     read_sections(&mut reader, 0, 0)
 }
 
-fn strip_indent(text: &str) -> (usize, &str) {
-    let indent = compute_indentation(text);
-    (indent, &text[indent..])
-}
-
 fn compute_indentation(text: &str) -> usize {
-    text.chars().take_while(|&c| c == ' ').count() as usize
+    text.chars().take_while(|&c| c == ' ').count()
 }
 
 #[cfg(test)]

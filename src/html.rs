@@ -1,10 +1,8 @@
 use crate::commands::{CommandDesc, CommandId, ProgramDesc};
-use crate::text::RichText;
+use askama::Template;
 use askama::filters::{Escaper, Html};
-use askama::{Template, filters};
 use serde::Serialize;
 use std::collections::HashMap;
-use std::fmt::Debug;
 
 #[derive(Template)]
 #[template(path = "page.html")]
@@ -90,7 +88,10 @@ impl<'a> CommandJson<'a> {
                         .options
                         .iter()
                         .map(|o| OptionJson {
-                            id: { option_id += 1; format!("o{}-{}", desc.id, option_id) },
+                            id: {
+                                option_id += 1;
+                                format!("o{}-{}", desc.id, option_id)
+                            },
                             short: o.short.as_deref(),
                             long: escape_html(&o.long),
                             brief: o.brief.to_html(),
@@ -103,7 +104,11 @@ impl<'a> CommandJson<'a> {
     }
 }
 
-fn build_command_json<'a>(command: &'a CommandDesc, parent: Option<&str>, out: &mut HashMap<String, CommandJson<'a>>) {
+fn build_command_json<'a>(
+    command: &'a CommandDesc,
+    parent: Option<&str>,
+    out: &mut HashMap<String, CommandJson<'a>>,
+) {
     let id = format!("c{}", command.id);
     for c in &command.commands {
         build_command_json(c, Some(id.as_str()), out);
@@ -112,13 +117,13 @@ fn build_command_json<'a>(command: &'a CommandDesc, parent: Option<&str>, out: &
 }
 
 fn escape_html(s: &str) -> String {
-    let html = Html::default();
+    let html = Html;
     let mut out = String::new();
     html.write_escaped_str(&mut out, s).unwrap();
     out
 }
 
-fn build_command_tree<'a, 'b>(command: &'a CommandDesc, depth: u32) -> CommandTemplate<'a> {
+fn build_command_tree(command: &CommandDesc, depth: u32) -> CommandTemplate {
     let subcommands = command
         .commands
         .iter()

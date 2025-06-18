@@ -1,5 +1,4 @@
 use crate::extractor::runner::collect_program_info;
-use std::env::current_dir;
 use std::path::Path;
 
 // #[test]

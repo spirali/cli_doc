@@ -26,24 +26,6 @@ fn get_program_output(program: &Path, args: &[String], flag: &str) -> anyhow::Re
     }
 }
 
-fn concat_lines(s: String, lines: &[&str]) -> String {
-    let mut result = s;
-    if !result.is_empty() && !lines.is_empty() {
-        result.push('\n');
-    }
-    for (i, line) in lines.iter().enumerate() {
-        result.push_str(line.trim());
-        if i + 1 < lines.len() {
-            result.push('\n');
-        }
-    }
-    result
-}
-
-fn first_split_or_all<'a, 'b>(input: &'a str, delimiter: &'b str) -> &'a str {
-    input.split(delimiter).next().unwrap_or(input)
-}
-
 fn gather_command_helper(
     program: &Path,
     args: &mut Vec<String>,

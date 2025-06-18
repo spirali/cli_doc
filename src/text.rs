@@ -14,27 +14,27 @@ pub enum RichTextPart {
 
 impl RichTextPart {
     pub fn to_html_into(&self, out: &mut String) {
-        let html = Html::default();
+        let html = Html;
         match self {
             RichTextPart::Text(s) => {
                 out.push_str("<p>");
-                html.write_escaped_str(&mut *out, &s).unwrap();
+                html.write_escaped_str(&mut *out, s).unwrap();
                 out.push_str("</p>");
             }
             RichTextPart::Ul(items) => {
                 out.push_str("<ul>");
                 for item in items {
                     out.push_str("<li>");
-                    html.write_escaped_str(&mut *out, &item).unwrap();
+                    html.write_escaped_str(&mut *out, item).unwrap();
                     out.push_str("</li>");
                 }
                 out.push_str("</ul>");
             }
             RichTextPart::Config { key, value } => {
                 out.push_str("<p class=\"rt-config\">[");
-                html.write_escaped_str(&mut *out, &key).unwrap();
+                html.write_escaped_str(&mut *out, key).unwrap();
                 out.push_str(": <span class=\"rt-config-value\">");
-                html.write_escaped_str(&mut *out, &value).unwrap();
+                html.write_escaped_str(&mut *out, value).unwrap();
                 out.push_str("</span>]</p>");
             }
         }
@@ -48,7 +48,7 @@ impl RichText {
 
     pub fn from_single_line(line: &str) -> RichText {
         let mut text = RichText::new();
-        text.add_lines(&[&line]);
+        text.add_lines(&[line]);
         text
     }
 

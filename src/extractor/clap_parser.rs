@@ -1,6 +1,5 @@
 use crate::commands::{
-    ArgumentDesc, CategoryDesc, CommandDesc, CommandDoc, CommandId, CommandOuterDoc, OptionDesc,
-    Usage, UsagePart,
+    ArgumentDesc, CategoryDesc, CommandDoc, CommandOuterDoc, OptionDesc, Usage, UsagePart,
 };
 use crate::extractor::sections::Section;
 use crate::text::RichText;
@@ -156,10 +155,8 @@ impl ClapParser {
             section
                 .flatten_child_lines()
                 .filter_map(|line| {
-                    let Some((raw_name, desc)) = line.split_once("  ") else {
-                        return None;
-                    };
-                    let (short, name) = if let Some((first, second)) = raw_name.split_once(",") {
+                    let (raw_name, _desc) = line.split_once("  ")?;
+                    let (_short, name) = if let Some((first, second)) = raw_name.split_once(",") {
                         let first = first.trim().to_string();
                         let second = second.trim().to_string();
                         if first.len() > second.len() {
@@ -178,8 +175,8 @@ impl ClapParser {
                     }
                     Some(CommandOuterDoc {
                         name,
-                        short,
-                        description: desc.trim().to_string(),
+                        /*short,
+                        description: desc.trim().to_string(),*/
                     })
                 })
                 .collect()
@@ -206,7 +203,7 @@ fn parse_usage(input: &str) -> Usage {
     }
 }
 
-fn split_once2<'a, 'b>(s: &'a str, sep: &'b str) -> (&'a str, &'a str) {
+fn split_once2<'a>(s: &'a str, sep: &str) -> (&'a str, &'a str) {
     if let Some((left, right)) = s.split_once(sep) {
         (left, right)
     } else {

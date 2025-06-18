@@ -1,7 +1,7 @@
 mod clap_parser;
+mod man_parser;
 pub(crate) mod runner;
 pub(crate) mod sections;
-mod man_parser;
 
 #[cfg(test)]
 mod clap_parser_tests;

@@ -1,6 +1,6 @@
-use std::collections::HashSet;
 use crate::text::RichText;
 use askama::filters::{Escaper, Html};
+use std::collections::HashSet;
 
 pub type CommandId = u32;
 
@@ -44,22 +44,22 @@ pub struct Usage {
 impl Usage {
     pub fn to_html(&self) -> String {
         let mut out = String::new();
-        let html = Html::default();
+        let html = Html;
         for part in &self.parts {
             match part {
                 UsagePart::Command(command) => {
                     out.push_str("<span class=\"usage-command\">");
-                    html.write_escaped_str(&mut out, &command).unwrap();
+                    html.write_escaped_str(&mut out, command).unwrap();
                     out.push_str("</span> ");
                 }
                 UsagePart::Argument(argument) => {
                     out.push_str("<span class=\"usage-argument\">");
-                    html.write_escaped_str(&mut out, &argument).unwrap();
+                    html.write_escaped_str(&mut out, argument).unwrap();
                     out.push_str("</span> ");
                 }
                 UsagePart::Option(option) => {
                     out.push_str("<span class=\"usage-option\">");
-                    html.write_escaped_str(&mut out, &option).unwrap();
+                    html.write_escaped_str(&mut out, option).unwrap();
                     out.push_str("</span> ");
                 }
             }
@@ -91,8 +91,6 @@ impl CommandDoc {
 #[cfg_attr(test, derive(PartialEq, Eq))]
 pub struct CommandOuterDoc {
     pub name: String,
-    pub short: Option<String>,
-    pub description: String,
 }
 
 #[derive(Debug)]
@@ -107,7 +105,9 @@ pub struct CommandDesc {
 impl CommandDesc {
     fn prune_repeated_options_helper(&mut self, parent_options: &HashSet<&OptionDesc>) {
         self.doc.option_categories.retain_mut(|category| {
-            category.options.retain(|option| !parent_options.contains(option));
+            category
+                .options
+                .retain(|option| !parent_options.contains(option));
             !category.options.is_empty()
         });
         let mut my_options = parent_options.clone();
