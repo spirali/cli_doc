@@ -4,3 +4,4 @@
 
 * Fixed running on "ruff" ("help" command)
 * Fixed more configs on a single line
+* Fixed CSS style
