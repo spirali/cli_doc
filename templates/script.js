@@ -28,14 +28,10 @@ function toggleCommand(commandId, onlyExpand = false) {
 
 
 function selectCommand(command, element) {
-    // Remove selection from all items
     document.querySelectorAll('.tree-item').forEach(item => {
         item.classList.remove('selected');
     });
-
-    // Add selection to clicked item
     element.classList.add('selected');
-
     showCommandDetails(command);
     currentCommand = command;
 }
@@ -44,9 +40,6 @@ function showCommandDetails(command) {
     const data = commandData[command];
 
     if (!data) {
-        // document.getElementById('commandInfo').innerHTML = '<div class="no-selection">No information available</div>';
-        // document.getElementById('argumentsInfo').innerHTML = '<div class="no-selection">No arguments</div>';
-        // document.getElementById('optionsList').innerHTML = '<div class="no-selection">No options available</div>';
         return;
     }
 

@@ -1,21 +1,4 @@
 use crate::text::RichText;
-// #[derive(Debug)]
-// pub(crate) struct ParsedSubsection<'a> {
-//     pub subsection_title: &'a str,
-//     pub items: Vec<&'a str>,
-// }
-//
-// #[derive(Debug)]
-// pub(crate) struct ParsedSection<'a> {
-//     pub section_title: &'a str,
-//     pub subsections: Vec<ParsedSubsection<'a>>,
-// }
-//
-// #[derive(Debug)]
-// pub(crate) struct ParsedOutput<'a> {
-//     pub main_title: &'a str,
-//     pub sections: Vec<ParsedSection<'a>>,
-// }
 
 #[derive(Debug)]
 #[cfg_attr(test, derive(PartialEq, Eq, Clone))]
@@ -95,10 +78,6 @@ impl<'a> Section<'a> {
             section.subsections_as_rich_text_into(out);
         }
     }
-
-    // pub fn all(&self) -> String {
-    // #    self.paragraph.join()
-    // }
 }
 
 struct LineReader<'a> {
@@ -1076,23 +1055,5 @@ Run `cargo help add` for more detailed information.
                 }
             ]
         );
-
-        // assert_eq!(
-        //     parse_sections("xxx\n  -C <DIRECTORY>\n          Change\n      --locked"),
-        //     vec![
-        //         Section {
-        //             paragraph: vec!["first"],
-        //             subsections: vec![Section {
-        //                 paragraph: vec!["second"],
-        //                 subsections: vec![Section {
-        //                     paragraph: vec!["third"],
-        //                     subsections: vec![],
-        //                     indent: 1,
-        //                 }],
-        //                 indent: 1,
-        //             }, ],
-        //             indent: 0,
-        //         },
-        //     ])
     }
 }
