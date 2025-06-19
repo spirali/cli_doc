@@ -81,17 +81,21 @@ impl RichText {
                     continue 'main;
                 }
             }
-            if let Some(t) = line.strip_prefix('[') {
-                if let Some(t) = t.strip_suffix(']') {
-                    if let Some((left, right)) = t.split_once(':') {
-                        self.push_part(current);
-                        current = Some(RichTextPart::Config {
-                            key: left.trim().to_string(),
-                            value: right.trim().to_string(),
-                        });
-                        continue 'main;
+            if line.starts_with('[') {
+                let mut s: &str = *line;
+                while let Some((first, rest)) = s.split_once(']') {
+                    if let Some(t) = first.strip_prefix('[') {
+                        if let Some((left, right)) = t.split_once(':') {
+                            self.push_part(current);
+                            current = Some(RichTextPart::Config {
+                                key: left.trim().to_string(),
+                                value: right.trim().to_string(),
+                            });
+                        }
                     }
+                    s = rest.trim();
                 }
+                continue 'main;
             }
             if let Some(RichTextPart::Text(ref mut text)) = current {
                 text.push(' ');

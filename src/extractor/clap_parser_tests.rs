@@ -462,100 +462,58 @@ See 'cargo help <command>' for more information on a specific command.
         ],
     }
     "#);
-    assert_debug_snapshot!(commands, @r#"
-        [
-            CommandOuterDoc {
-                name: "build",
-                short: Some(
-                    "b",
-                ),
-                description: "Compile the current package",
-            },
-            CommandOuterDoc {
-                name: "check",
-                short: Some(
-                    "c",
-                ),
-                description: "Analyze the current package and report errors, but don't build object files",
-            },
-            CommandOuterDoc {
-                name: "clean",
-                short: None,
-                description: "Remove the target directory",
-            },
-            CommandOuterDoc {
-                name: "doc",
-                short: Some(
-                    "d",
-                ),
-                description: "Build this package's and its dependencies' documentation",
-            },
-            CommandOuterDoc {
-                name: "new",
-                short: None,
-                description: "Create a new cargo package",
-            },
-            CommandOuterDoc {
-                name: "init",
-                short: None,
-                description: "Create a new cargo package in an existing directory",
-            },
-            CommandOuterDoc {
-                name: "add",
-                short: None,
-                description: "Add dependencies to a manifest file",
-            },
-            CommandOuterDoc {
-                name: "remove",
-                short: None,
-                description: "Remove dependencies from a manifest file",
-            },
-            CommandOuterDoc {
-                name: "run",
-                short: Some(
-                    "r",
-                ),
-                description: "Run a binary or example of the local package",
-            },
-            CommandOuterDoc {
-                name: "test",
-                short: Some(
-                    "t",
-                ),
-                description: "Run the tests",
-            },
-            CommandOuterDoc {
-                name: "bench",
-                short: None,
-                description: "Run the benchmarks",
-            },
-            CommandOuterDoc {
-                name: "update",
-                short: None,
-                description: "Update dependencies listed in Cargo.lock",
-            },
-            CommandOuterDoc {
-                name: "search",
-                short: None,
-                description: "Search registry for crates",
-            },
-            CommandOuterDoc {
-                name: "publish",
-                short: None,
-                description: "Package and upload this package to the registry",
-            },
-            CommandOuterDoc {
-                name: "install",
-                short: None,
-                description: "Install a Rust binary",
-            },
-            CommandOuterDoc {
-                name: "uninstall",
-                short: None,
-                description: "Uninstall a Rust binary",
-            },
-        ]
-        "#);
+    assert_debug_snapshot!(commands, @r###"
+    [
+        CommandOuterDoc {
+            name: "build",
+        },
+        CommandOuterDoc {
+            name: "check",
+        },
+        CommandOuterDoc {
+            name: "clean",
+        },
+        CommandOuterDoc {
+            name: "doc",
+        },
+        CommandOuterDoc {
+            name: "new",
+        },
+        CommandOuterDoc {
+            name: "init",
+        },
+        CommandOuterDoc {
+            name: "add",
+        },
+        CommandOuterDoc {
+            name: "remove",
+        },
+        CommandOuterDoc {
+            name: "run",
+        },
+        CommandOuterDoc {
+            name: "test",
+        },
+        CommandOuterDoc {
+            name: "bench",
+        },
+        CommandOuterDoc {
+            name: "update",
+        },
+        CommandOuterDoc {
+            name: "search",
+        },
+        CommandOuterDoc {
+            name: "publish",
+        },
+        CommandOuterDoc {
+            name: "install",
+        },
+        CommandOuterDoc {
+            name: "uninstall",
+        },
+    ]
+    "###);
 }
 
 #[test]
@@ -772,7 +730,22 @@ GLOBAL OPTIONS:
         ],
     }
     "#);
-    assert_debug_snapshot!(commands, @r#""#);
+    assert_debug_snapshot!(commands, @r###"
+    [
+        CommandOuterDoc {
+            name: "start",
+        },
+        CommandOuterDoc {
+            name: "stop",
+        },
+        CommandOuterDoc {
+            name: "info",
+        },
+        CommandOuterDoc {
+            name: "generate-access",
+        },
+    ]
+    "###);
 }
 
 #[test]
