@@ -40,6 +40,7 @@ fn gather_command_helper(
 
     let commands: Vec<_> = subcommands
         .into_iter()
+        .filter(|s| s.name != "help")
         .map(|s| {
             args.push(s.name.to_string());
             let r = gather_command_helper(program, args, id_counter);
