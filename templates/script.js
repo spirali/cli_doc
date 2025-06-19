@@ -1,4 +1,3 @@
-
 function toggleEvent(event, commandId) {
     event.stopPropagation();
     toggleCommand(commandId);
@@ -69,7 +68,7 @@ function showCommandDetails(command) {
                 desc = `<div class="option-full-doc">${argument.description}</div>`;
                 className = "option-item-expandable";
                 showMore = '<div class="show-more-indicator">Show more</div>';
-                onClick='onClick="toggleFullDoc(this)"';
+                onClick = 'onClick="toggleFullDoc(this)"';
             }
             return `<div class="option-item ${className}" ${onClick}">
                     <div class="option-header">
@@ -80,7 +79,8 @@ function showCommandDetails(command) {
                         ${showMore}
                     </div>
                     ${desc}
-                </div>`});
+                </div>`
+        });
         document.getElementById('argumentsInfo').innerHTML = `<div class="info-section">
                     <div class="info-header">
                         Arguments
@@ -105,7 +105,7 @@ function showCommandDetails(command) {
                         desc = `<div class="option-full-doc">${option.description}</div>`;
                         className = "option-item-expandable";
                         showMore = '<div class="show-more-indicator">Show more</div>';
-                        onClick='onClick="toggleFullDoc(this)"';
+                        onClick = 'onClick="toggleFullDoc(this)"';
                     }
                     let short = "";
                     if (option.short) {
