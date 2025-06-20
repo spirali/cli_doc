@@ -82,7 +82,7 @@ impl RichText {
                 }
             }
             if line.starts_with('[') {
-                let mut s: &str = *line;
+                let mut s: &str = line;
                 while let Some((first, rest)) = s.split_once(']') {
                     if let Some(t) = first.strip_prefix('[') {
                         if let Some((left, right)) = t.split_once(':') {

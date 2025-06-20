@@ -892,3 +892,37 @@ Usage: cargo add [OPTIONS] <DEP>[@<VERSION>] ...
         "#);
     assert!(commands.is_empty());
 }
+
+#[test]
+fn test_parse_clap_only_usage() {
+    let text = "Usage: cargo new [OPTIONS] <PATH>";
+    let (doc, _commands) = parse_clap(text);
+    assert_debug_snapshot!(doc, @r###"
+    CommandDoc {
+        brief: RichText {
+            parts: [],
+        },
+        description: None,
+        usage: [
+            Usage {
+                parts: [
+                    Command(
+                        "cargo",
+                    ),
+                    Command(
+                        "new",
+                    ),
+                    Option(
+                        "[OPTIONS]",
+                    ),
+                    Argument(
+                        "<PATH>",
+                    ),
+                ],
+            },
+        ],
+        arguments: [],
+        option_categories: [],
+    }
+    "###);
+}

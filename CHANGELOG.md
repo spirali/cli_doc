@@ -1,3 +1,9 @@
+# Unrealsed
+
+## Fixes
+
+* Fix parsing command help without brief description
+
 # v0.1.1
 
 ## Fixes

@@ -21,10 +21,13 @@ impl ClapParser {
             bail!("Input is empty");
         };
         let mut brief = RichText::new();
-        sections[0].as_rich_text_into(&mut brief);
-
+        let mut intro_section = if !sections[0].first_line().starts_with("Usage: ") {
+            sections[0].as_rich_text_into(&mut brief);
+            1
+        } else {
+            0
+        };
         let mut desc = RichText::new();
-        let mut intro_section = 1;
         let usage = loop {
             if let Some(s) = sections.get(intro_section) {
                 if s.first_line().starts_with("Usage: ") {
