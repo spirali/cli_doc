@@ -49,6 +49,8 @@ struct CategoryJson<'a> {
 struct CommandJson<'a> {
     name: String,
     parent: Option<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    children: Vec<String>,
     brief: String,
     description: Option<String>,
     usages: Vec<String>,
@@ -62,6 +64,7 @@ impl<'a> CommandJson<'a> {
         CommandJson {
             name: desc.name.to_string(),
             parent: parent.map(|x| x.to_string()),
+            children: desc.commands.iter().map(|c| format!("c{}", c.id)).collect(),
             brief: desc.doc.brief.to_html(),
             description: desc.doc.description.as_ref().map(|t| t.to_html()),
             usages: desc.doc.usage.iter().map(|u| u.to_html()).collect(),

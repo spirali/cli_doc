@@ -1,5 +1,9 @@
 # Unrealsed
 
+## New features
+
+* Selecting commands via anchors in URL
+
 ## Fixes
 
 * Fix parsing command help without brief description

@@ -418,7 +418,7 @@
         }
     </style>
 </head>
-<body>
+<body onload="init()">
 <div class="container">
     <div class="header">
         <div class="search-container">
@@ -477,7 +477,6 @@
     let searchIndex = 0;
     let currentCommand = "c0";
     {% include "script.js" %}
-    showCommandDetails('c0');
 </script>
 </body>
 </html>

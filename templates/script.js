@@ -5,6 +5,9 @@ function toggleEvent(event, commandId) {
 
 function toggleCommand(commandId, onlyExpand = false) {
     const triangleElement = document.getElementById("triangle-" + commandId);
+    if (triangleElement === null) {
+        return;
+    }
     const isExpanded = triangleElement.classList.contains('expanded');
 
     if (isExpanded && onlyExpand) {
@@ -135,32 +138,6 @@ function showCommandDetails(command) {
     }
 }
 
-function expandArgument(element) {
-    const fullDoc = element.querySelector('.option-full-doc');
-    const isExpanded = fullDoc.classList.contains('expanded');
-
-    document.querySelectorAll('.option-full-doc.expanded').forEach(doc => {
-        doc.classList.remove('expanded');
-    });
-
-    if (!isExpanded) {
-        fullDoc.classList.add('expanded');
-    }
-}
-
-function toggleFullDoc(element) {
-    const fullDoc = element.querySelector('.option-full-doc');
-    const isExpanded = fullDoc.classList.contains('expanded');
-
-    document.querySelectorAll('.option-full-doc.expanded').forEach(doc => {
-        doc.classList.remove('expanded');
-    });
-
-    if (!isExpanded) {
-        fullDoc.classList.add('expanded');
-    }
-}
-
 function expandCommandsTo(id) {
     toggleCommand(id, true);
     let command = commandData[id];
@@ -263,4 +240,32 @@ function resetSearch() {
         hideSearchWidget();
         searchResults = null;
     }
+}
+
+function init() {
+    const hash = window.location.hash;
+    const parts = hash.slice(1).split('/');
+    if (parts.length < 2) {
+        showCommandDetails("c0");
+    }
+    let currentId = "c0";
+    for (const part of parts.slice(1)) {
+        let current = commandData[currentId];
+        let found = false;
+        if (current.children) {
+            for (const child_id of current.children) {
+                let child = commandData[child_id];
+                if (child.name === part) {
+                    found = true;
+                    currentId = child_id;
+                    break
+                }
+            }
+        }
+        if (!found) {
+            break
+        }
+    }
+    expandCommandsTo(currentId);
+    selectCommand(currentId, document.getElementById(`node-${currentId}`));
 }
