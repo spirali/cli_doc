@@ -58,10 +58,10 @@ impl RichText {
 
     fn push_part(&mut self, item: Option<RichTextPart>) {
         if let Some(item) = item {
-            if let RichTextPart::Text(text) = &item {
-                if text.is_empty() {
-                    return;
-                }
+            if let RichTextPart::Text(text) = &item
+                && text.is_empty()
+            {
+                return;
             }
             self.parts.push(item);
         }
@@ -84,14 +84,14 @@ impl RichText {
             if line.starts_with('[') {
                 let mut s: &str = line;
                 while let Some((first, rest)) = s.split_once(']') {
-                    if let Some(t) = first.strip_prefix('[') {
-                        if let Some((left, right)) = t.split_once(':') {
-                            self.push_part(current);
-                            current = Some(RichTextPart::Config {
-                                key: left.trim().to_string(),
-                                value: right.trim().to_string(),
-                            });
-                        }
+                    if let Some(t) = first.strip_prefix('[')
+                        && let Some((left, right)) = t.split_once(':')
+                    {
+                        self.push_part(current);
+                        current = Some(RichTextPart::Config {
+                            key: left.trim().to_string(),
+                            value: right.trim().to_string(),
+                        });
                     }
                     s = rest.trim();
                 }

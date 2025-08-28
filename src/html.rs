@@ -126,7 +126,7 @@ fn escape_html(s: &str) -> String {
     out
 }
 
-fn build_command_tree(command: &CommandDesc, depth: u32) -> CommandTemplate {
+fn build_command_tree<'a>(command: &'a CommandDesc, depth: u32) -> CommandTemplate<'a> {
     let subcommands = command
         .commands
         .iter()
