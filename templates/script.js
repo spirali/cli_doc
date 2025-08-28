@@ -269,3 +269,16 @@ function init() {
     expandCommandsTo(currentId);
     selectCommand(currentId, document.getElementById(`node-${currentId}`));
 }
+
+function toggleFullDoc(element) {
+    const fullDoc = element.querySelector('.option-full-doc');
+    const isExpanded = fullDoc.classList.contains('expanded');
+
+    document.querySelectorAll('.option-full-doc.expanded').forEach(doc => {
+        doc.classList.remove('expanded');
+    });
+
+    if (!isExpanded) {
+        fullDoc.classList.add('expanded');
+    }
+}
